@@ -9,6 +9,8 @@ namespace PokerSNTS.Domain.Entities
             Description = description;
         }
 
+        protected Regulation() { }
+
         public string Description { get; private set; }
 
         public override bool IsValid => Validate();

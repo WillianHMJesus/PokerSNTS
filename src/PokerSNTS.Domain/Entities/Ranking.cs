@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using System.Collections.Generic;
 
 namespace PokerSNTS.Domain.Entities
 {
@@ -10,8 +11,11 @@ namespace PokerSNTS.Domain.Entities
             AwardValue = awardValue;
         }
 
+        protected Ranking() { }
+
         public string Description { get; private set; }
         public decimal? AwardValue { get; private set; }
+        public virtual IReadOnlyCollection<Round> Rounds { get; private set; }
 
         public override bool IsValid => Validate();
 

@@ -10,6 +10,8 @@ namespace PokerSNTS.Domain.Entities
             Punctuation = punctuation;
         }
 
+        protected RankingPunctuation() { }
+
         public short Position { get; private set; }
         public short Punctuation { get; private set; }
 
