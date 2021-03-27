@@ -16,8 +16,8 @@ namespace PokerSNTS.Domain.Entities
 
         public string Description { get; private set; }
         public DateTime Date { get; private set; }
-        public virtual IReadOnlyCollection<PlayerRound> PlayersRounds { get; private set; }
-        public virtual IReadOnlyCollection<Ranking> Ranking { get; private set; }
+        public virtual ICollection<PlayerRound> PlayersRounds { get; private set; }
+        public virtual ICollection<Ranking> Ranking { get; private set; }
 
         public override bool IsValid => Validate();
 

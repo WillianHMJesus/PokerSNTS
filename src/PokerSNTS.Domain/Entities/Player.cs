@@ -13,7 +13,7 @@ namespace PokerSNTS.Domain.Entities
         protected Player() { }
 
         public string Name { get; private set; }
-        public virtual IReadOnlyCollection<PlayerRound> PlayersRounds { get; private set; }
+        public virtual ICollection<PlayerRound> PlayersRounds { get; private set; }
 
         public override bool IsValid => Validate();
 

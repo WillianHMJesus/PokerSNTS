@@ -15,7 +15,7 @@ namespace PokerSNTS.Domain.Entities
 
         public string Description { get; private set; }
         public decimal? AwardValue { get; private set; }
-        public virtual IReadOnlyCollection<Round> Rounds { get; private set; }
+        public virtual ICollection<Round> Rounds { get; private set; }
 
         public override bool IsValid => Validate();
 
