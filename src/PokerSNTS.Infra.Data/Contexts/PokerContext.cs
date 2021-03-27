@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PokerSNTS.Domain.Entities;
-using PokerSNTS.Domain.Interfaces.UnitOfWork;
-using System.Threading.Tasks;
 
 namespace PokerSNTS.Infra.Data.Contexts
 {
-    public sealed class PokerContext : DbContext, IUnitOfWork
+    public sealed class PokerContext : DbContext
     {
         public PokerContext(DbContextOptions<PokerContext> options)
             : base(options) { }
@@ -28,11 +26,6 @@ namespace PokerSNTS.Infra.Data.Contexts
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(PokerContext).Assembly);
 
             base.OnModelCreating(modelBuilder);
-        }
-
-        public async Task<bool> Commit()
-        {
-            return await base.SaveChangesAsync() > 0;
         }
     }
 }
