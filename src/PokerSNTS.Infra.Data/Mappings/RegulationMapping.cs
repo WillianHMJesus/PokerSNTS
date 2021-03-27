@@ -15,6 +15,9 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .IsRequired()
                 .HasColumnType("varchar")
                 .HasMaxLength(8000);
+
+            builder.Ignore(x => x.ValidationResult);
+            builder.Ignore(x => x.IsValid);
         }
     }
 }

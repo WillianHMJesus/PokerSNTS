@@ -17,12 +17,6 @@ namespace PokerSNTS.Infra.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
-            {
-                entity.AddIgnored("ValidationResult");
-                entity.AddIgnored("IsValid");
-            }
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(PokerContext).Assembly);
 
             base.OnModelCreating(modelBuilder);

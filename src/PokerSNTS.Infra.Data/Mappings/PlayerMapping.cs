@@ -19,6 +19,9 @@ namespace PokerSNTS.Infra.Data.Mappings
             builder.HasMany(x => x.PlayersRounds)
                 .WithOne(x => x.Player)
                 .HasForeignKey(x => x.PlayerId);
+
+            builder.Ignore(x => x.ValidationResult);
+            builder.Ignore(x => x.IsValid);
         }
     }
 }

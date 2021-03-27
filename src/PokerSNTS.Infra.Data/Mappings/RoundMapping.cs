@@ -26,6 +26,9 @@ namespace PokerSNTS.Infra.Data.Mappings
             builder.HasMany(x => x.Ranking)
                 .WithMany(x => x.Rounds)
                 .UsingEntity(x => x.ToTable("RankingRounds"));
+
+            builder.Ignore(x => x.ValidationResult);
+            builder.Ignore(x => x.IsValid);
         }
     }
 }

@@ -10,6 +10,9 @@ namespace PokerSNTS.Infra.Data.Mappings
         {
             builder.ToTable("RankingPunctuations");
             builder.HasKey(x => x.Id);
+
+            builder.Ignore(x => x.ValidationResult);
+            builder.Ignore(x => x.IsValid);
         }
     }
 }
