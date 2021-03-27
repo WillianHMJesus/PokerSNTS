@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
 {
-    public interface IRankingRepository
+    public interface IRankingRepository : IRepository<Ranking>
     {
-        void Add(Ranking ranking);
-        void Update(Ranking ranking);
         Task<IEnumerable<Ranking>> GetAll();
     }
 }

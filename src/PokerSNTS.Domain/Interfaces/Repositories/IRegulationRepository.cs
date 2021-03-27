@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
 {
-    public interface IRegulationRepository
+    public interface IRegulationRepository : IRepository<Regulation>
     {
-        void Add(Regulation regulation);
-        void Update(Regulation regulation);
         Task<IEnumerable<Regulation>> GetAll();
     }
 }

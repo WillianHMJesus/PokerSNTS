@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
 {
-    public interface IPlayerRepository
+    public interface IPlayerRepository : IRepository<Player>
     {
-        void Add(Player player);
-        void Update(Player player);
         Task<IEnumerable<Player>> GetAll();
     }
 }

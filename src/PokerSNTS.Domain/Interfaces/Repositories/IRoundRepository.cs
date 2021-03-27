@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
 {
-    public interface IRoundRepository
+    public interface IRoundRepository : IRepository<Round>
     {
-        void Add(Round round);
-        void Update(Round round);
         Task<Round> GetRoundByRankingId(Guid rankingId);
     }
 }
