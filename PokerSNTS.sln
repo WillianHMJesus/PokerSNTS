@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokerSNTS.Domain", "src\PokerSNTS.Domain\PokerSNTS.Domain.csproj", "{3EF5BFBC-7BAF-4930-BC44-1381BB6EBC09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerSNTS.Infra.Data", "src\PokerSNTS.Infra.Data\PokerSNTS.Infra.Data.csproj", "{7E51EFD9-C4E4-4E34-9933-4FECCA76044C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokerSNTS.Infra.Data", "src\PokerSNTS.Infra.Data\PokerSNTS.Infra.Data.csproj", "{7E51EFD9-C4E4-4E34-9933-4FECCA76044C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerSNTS.API", "src\PokerSNTS.API\PokerSNTS.API.csproj", "{7A7B8D17-C63F-4DB2-931C-8DD46792D481}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7E51EFD9-C4E4-4E34-9933-4FECCA76044C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E51EFD9-C4E4-4E34-9933-4FECCA76044C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E51EFD9-C4E4-4E34-9933-4FECCA76044C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A7B8D17-C63F-4DB2-931C-8DD46792D481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A7B8D17-C63F-4DB2-931C-8DD46792D481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A7B8D17-C63F-4DB2-931C-8DD46792D481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A7B8D17-C63F-4DB2-931C-8DD46792D481}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
