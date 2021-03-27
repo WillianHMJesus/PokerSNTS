@@ -5,12 +5,15 @@ namespace PokerSNTS.Domain.Entities
 {
     public abstract class Entity
     {
-        public Entity(Guid id)
+        public Entity()
         {
-            Id = id;
+            Id = Guid.NewGuid();
         }
 
         public Guid Id { get; private set; }
         public ValidationResult ValidationResult { get; private set; }
+        public abstract bool IsValid { get; }
+
+        public void SetValidationResult(ValidationResult validationResult) => ValidationResult = validationResult;
     }
 }
