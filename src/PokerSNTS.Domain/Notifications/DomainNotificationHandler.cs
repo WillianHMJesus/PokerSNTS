@@ -15,7 +15,7 @@ namespace PokerSNTS.Domain.Notifications
 
         public void HandleNotification(ValidationResult validationResult)
         {
-            foreach (var error in validationResult?.Errors ?? Enumerable.Empty<ValidationFailure>())
+            foreach (var error in validationResult?.Errors)
             {
                 _notifications.Add(new DomainNotification("DomainValidation", error.ErrorMessage));
             }

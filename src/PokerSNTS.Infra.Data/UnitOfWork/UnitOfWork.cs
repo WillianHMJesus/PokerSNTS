@@ -23,12 +23,10 @@ namespace PokerSNTS.Infra.Data.UnitOfWork
                 {
                     entry.Property("Created").CurrentValue = DateTime.Now;
                     entry.Property("Actived").CurrentValue = true;
-                    entry.Property("Updated").IsModified = false;
                 }
 
                 if(entry.State == EntityState.Modified)
                 {
-                    entry.Property("Updated").CurrentValue = DateTime.Now;
                     entry.Property("Created").IsModified = false;
                 }
             }
