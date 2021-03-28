@@ -3,6 +3,7 @@ using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -25,28 +26,37 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<bool> Add(Regulation regulation)
         {
-            if(regulation.IsValid)
+            var validationResult = regulation.Validate();
+            if(validationResult.IsValid)
             {
                 _regulationRepository.Add(regulation);
 
                 return await _unitOfWork.Commit();
             }
 
-            _notification.HandleNotification(regulation.ValidationResult);
+            _notification.HandleNotification(validationResult);
 
             return false;
         }
 
-        public async Task<bool> Update(Regulation regulation)
+        public async Task<bool> Update(Guid id, Regulation regulation)
         {
-            if (regulation.IsValid)
+            var existingRegulation = await _regulationRepository.GetById(id);
+            if (existingRegulation == null) _notification.HandleNotification("DomainValidation", "Regulamento não encontrado");
+
+            if(!_notification.HasNotification())
             {
-                _regulationRepository.Update(regulation);
+                existingRegulation.Update(regulation.Description);
+                var validationResult = existingRegulation.Validate();
+                if (validationResult.IsValid)
+                {
+                    _regulationRepository.Update(existingRegulation);
 
-                return await _unitOfWork.Commit();
+                    return await _unitOfWork.Commit();
+                }
+
+                _notification.HandleNotification(validationResult);
             }
-
-            _notification.HandleNotification(regulation.ValidationResult);
 
             return false;
         }

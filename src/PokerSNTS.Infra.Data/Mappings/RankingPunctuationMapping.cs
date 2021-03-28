@@ -12,7 +12,6 @@ namespace PokerSNTS.Infra.Data.Mappings
             builder.HasKey(x => x.Id);
 
             builder.Ignore(x => x.ValidationResult);
-            builder.Ignore(x => x.IsValid);
         }
     }
 }

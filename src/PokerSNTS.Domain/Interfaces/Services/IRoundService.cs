@@ -8,7 +8,7 @@ namespace PokerSNTS.Domain.Interfaces.Services
     public interface IRoundService
     {
         Task<bool> Add(Round round);
-        Task<bool> Update(Round round);
+        Task<bool> Update(Guid id, Round round);
         Task<IEnumerable<Round>> GetRoundByRankingId(Guid rankingId);
     }
 }

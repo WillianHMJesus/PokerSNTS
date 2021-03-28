@@ -29,6 +29,12 @@ namespace PokerSNTS.Domain.Entities
             return validationResult;
         }
 
+        public void Update(string description, DateTime date)
+        {
+            Description = description;
+            Date = date;
+        }
+
         private class RoundValidator : AbstractValidator<Round>
         {
             public RoundValidator()

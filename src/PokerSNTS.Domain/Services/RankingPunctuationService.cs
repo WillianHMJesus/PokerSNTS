@@ -3,6 +3,7 @@ using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
+using System;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -24,28 +25,37 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<bool> Add(RankingPunctuation rankingPunctuation)
         {
-            if(rankingPunctuation.IsValid)
+            var validationResult = rankingPunctuation.Validate();
+            if (validationResult.IsValid)
             {
                 _rankingPunctuationRepository.Add(rankingPunctuation);
 
                 return await _unitOfWork.Commit();
             }
 
-            _notification.HandleNotification(rankingPunctuation.ValidationResult);
+            _notification.HandleNotification(validationResult);
 
             return false;
         }
 
-        public async Task<bool> Update(RankingPunctuation rankingPunctuation)
+        public async Task<bool> Update(Guid id, RankingPunctuation rankingPunctuation)
         {
-            if (rankingPunctuation.IsValid)
+            var existingRankingPunctuation = await _rankingPunctuationRepository.GetById(id);
+            if (existingRankingPunctuation == null) _notification.HandleNotification("DomainValidation", "Pontuação do ranking não foi encontrada.");
+
+            if(!_notification.HasNotification())
             {
-                _rankingPunctuationRepository.Update(rankingPunctuation);
+                existingRankingPunctuation.Update(rankingPunctuation.Position, rankingPunctuation.Punctuation);
+                var validationResult = existingRankingPunctuation.Validate();
+                if (validationResult.IsValid)
+                {
+                    _rankingPunctuationRepository.Update(existingRankingPunctuation);
 
-                return await _unitOfWork.Commit();
+                    return await _unitOfWork.Commit();
+                }
+
+                _notification.HandleNotification(validationResult);
             }
-
-            _notification.HandleNotification(rankingPunctuation.ValidationResult);
 
             return false;
         }

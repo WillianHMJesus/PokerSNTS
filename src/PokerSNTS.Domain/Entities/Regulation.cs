@@ -23,6 +23,11 @@ namespace PokerSNTS.Domain.Entities
             return validationResult;
         }
 
+        public void Update(string description)
+        {
+            Description = description;
+        }
+
         private class RegulationValidator : AbstractValidator<Regulation>
         {
             public RegulationValidator()

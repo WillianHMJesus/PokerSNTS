@@ -3,6 +3,7 @@ using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -25,28 +26,37 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<bool> Add(Player player)
         {
-            if(player.IsValid)
+            var validationResult = player.Validate();
+            if (validationResult.IsValid)
             {
                 _playerRepository.Add(player);
 
                 return await _unitOfWork.Commit();
             }
 
-            _notification.HandleNotification(player.ValidationResult);
+            _notification.HandleNotification(validationResult);
 
             return false;
         }
 
-        public async Task<bool> Update(Player player)
+        public async Task<bool> Update(Guid id, Player player)
         {
-            if(player.IsValid)
+            var existingPlayer = await _playerRepository.GetById(id);
+            if (existingPlayer == null) _notification.HandleNotification("DomainValidation", "Jogador não encontrado.");
+
+            if(!_notification.HasNotification())
             {
-                _playerRepository.Update(player);
+                existingPlayer.Update(player.Name);
+                var validationResult = existingPlayer.Validate();
+                if (validationResult.IsValid)
+                {
+                    _playerRepository.Update(existingPlayer);
 
-                return await _unitOfWork.Commit();
+                    return await _unitOfWork.Commit();
+                }
+
+                _notification.HandleNotification(validationResult);
             }
-
-            _notification.HandleNotification(player.ValidationResult);
 
             return false;
         }

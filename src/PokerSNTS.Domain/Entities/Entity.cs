@@ -9,7 +9,6 @@ namespace PokerSNTS.Domain.Entities
 
         public Guid Id { get; protected set; }
         public DateTime Created { get; protected set; }
-        public DateTime? Updated { get; protected set; }
         public bool Actived { get; protected set; }
         public ValidationResult ValidationResult { get; protected set; }
 

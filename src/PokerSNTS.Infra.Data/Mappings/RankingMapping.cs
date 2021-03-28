@@ -21,7 +21,6 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .UsingEntity(x => x.ToTable("RankingRounds"));
 
             builder.Ignore(x => x.ValidationResult);
-            builder.Ignore(x => x.IsValid);
         }
     }
 }

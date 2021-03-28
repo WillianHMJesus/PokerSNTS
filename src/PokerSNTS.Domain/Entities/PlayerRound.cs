@@ -32,6 +32,14 @@ namespace PokerSNTS.Domain.Entities
             return validationResult;
         }
 
+        public void Update(short position, short punctuation, Guid playerId, Guid roundId)
+        {
+            Position = position;
+            Punctuation = punctuation;
+            PlayerId = playerId;
+            RoundId = roundId;
+        }
+
         private class PlayerRoundValidator : AbstractValidator<PlayerRound>
         {
             public PlayerRoundValidator()

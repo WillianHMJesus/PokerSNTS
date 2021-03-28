@@ -1,8 +1,10 @@
-﻿using PokerSNTS.Domain.Entities;
+﻿using PokerSNTS.Domain.DTOs;
+using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -25,35 +27,51 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<bool> Add(Ranking ranking)
         {
-            if(ranking.IsValid)
+            var validationResult = ranking.Validate();
+            if (validationResult.IsValid)
             {
                 _rankingRepository.Add(ranking);
 
                 return await _unitOfWork.Commit();
             }
 
-            _notification.HandleNotification(ranking.ValidationResult);
+            _notification.HandleNotification(validationResult);
 
             return false;
         }
 
-        public async Task<bool> Update(Ranking ranking)
+        public async Task<bool> Update(Guid id, Ranking ranking)
         {
-            if (ranking.IsValid)
-            {
-                _rankingRepository.Update(ranking);
+            var existingRanking = await _rankingRepository.GetById(id);
+            if (existingRanking == null) _notification.HandleNotification("DomainValidation", "Ranking não encontrado.");
 
-                return await _unitOfWork.Commit();
+            if (!_notification.HasNotification())
+            {
+                existingRanking.Update(ranking.Description, ranking.AwardValue);
+                var validationResult = existingRanking.Validate();
+                if (validationResult.IsValid)
+                {
+                    _rankingRepository.Update(existingRanking);
+
+                    return await _unitOfWork.Commit();
+                }
+
+                _notification.HandleNotification(validationResult);
             }
 
-            _notification.HandleNotification(ranking.ValidationResult);
-
             return false;
         }
 
-        public async Task<IEnumerable<Ranking>> GetAll()
+        public async Task<IEnumerable<RankingDTO>> GetAll()
         {
-            return await _rankingRepository.GetAll();
+            var rankingDTO = new List<RankingDTO>();
+            var taskRanking = await _rankingRepository.GetAll();
+            foreach (var ranking in taskRanking)
+            {
+                rankingDTO.Add(new RankingDTO(ranking));
+            }
+
+            return await Task.FromResult(rankingDTO);
         }
     }
 }

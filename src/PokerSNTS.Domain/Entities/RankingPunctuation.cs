@@ -25,6 +25,12 @@ namespace PokerSNTS.Domain.Entities
             return validationResult;
         }
 
+        public void Update(short position, short punctuation)
+        {
+            Position = position;
+            Punctuation = punctuation;
+        }
+
         private class RankingPunctuationValidator : AbstractValidator<RankingPunctuation>
         {
             public RankingPunctuationValidator()

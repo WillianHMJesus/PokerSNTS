@@ -26,28 +26,37 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<bool> Add(Round round)
         {
-            if(round.IsValid)
+            var validationResult = round.Validate();
+            if(validationResult.IsValid)
             {
                 _roundRepository.Add(round);
 
                 return await _unitOfWork.Commit();
             }
 
-            _notification.HandleNotification(round.ValidationResult);
+            _notification.HandleNotification(validationResult);
 
             return false;
         }
 
-        public async Task<bool> Update(Round round)
+        public async Task<bool> Update(Guid id, Round round)
         {
-            if (round.IsValid)
+            var existingRound = await _roundRepository.GetById(id);
+            if (existingRound == null) _notification.HandleNotification("DomainValidation", "Rodada não encontrada.");
+
+            if(!_notification.HasNotification())
             {
-                _roundRepository.Update(round);
+                existingRound.Update(round.Description, round.Date);
+                var validationResult = existingRound.Validate();
+                if (validationResult.IsValid)
+                {
+                    _roundRepository.Update(existingRound);
 
-                return await _unitOfWork.Commit();
+                    return await _unitOfWork.Commit();
+                }
+
+                _notification.HandleNotification(validationResult);
             }
-
-            _notification.HandleNotification(round.ValidationResult);
 
             return false;
         }

@@ -3,6 +3,7 @@ using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
+using System;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -24,28 +25,37 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<bool> Add(PlayerRound playerRound)
         {
-            if(playerRound.IsValid)
+            var validationResult = playerRound.Validate();
+            if(validationResult.IsValid)
             {
                 _playerRoundRepository.Add(playerRound);
 
                 return await _unitOfWork.Commit();
             }
 
-            _notification.HandleNotification(playerRound.ValidationResult);
+            _notification.HandleNotification(validationResult);
 
             return false;
         }
 
-        public async Task<bool> Update(PlayerRound playerRound)
+        public async Task<bool> Update(Guid id, PlayerRound playerRound)
         {
-            if (playerRound.IsValid)
+            var existingPlayerRound = await _playerRoundRepository.GetById(id);
+            if (existingPlayerRound == null) _notification.HandleNotification("DomainValidation", "Partida do jogador não encontrada.");
+
+            if(!_notification.HasNotification())
             {
-                _playerRoundRepository.Update(playerRound);
+                existingPlayerRound.Update(playerRound.Position, playerRound.Punctuation, playerRound.PlayerId, playerRound.RoundId);
+                var validationResult = existingPlayerRound.Validate();
+                if (validationResult.IsValid)
+                {
+                    _playerRoundRepository.Update(existingPlayerRound);
 
-                return await _unitOfWork.Commit();
+                    return await _unitOfWork.Commit();
+                }
+
+                _notification.HandleNotification(validationResult);
             }
-
-            _notification.HandleNotification(playerRound.ValidationResult);
 
             return false;
         }

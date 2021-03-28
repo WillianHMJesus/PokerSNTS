@@ -20,7 +20,6 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .HasForeignKey(x => x.RoundId);
 
             builder.Ignore(x => x.ValidationResult);
-            builder.Ignore(x => x.IsValid);
         }
     }
 }

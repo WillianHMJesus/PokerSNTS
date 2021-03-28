@@ -17,7 +17,6 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .HasMaxLength(8000);
 
             builder.Ignore(x => x.ValidationResult);
-            builder.Ignore(x => x.IsValid);
         }
     }
 }
