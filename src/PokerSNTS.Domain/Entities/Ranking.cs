@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using System.Collections.Generic;
 
 namespace PokerSNTS.Domain.Entities
 {
     public class Ranking : Entity
     {
-        public Ranking(string description, decimal awardValue)
+        public Ranking(string description, decimal? awardValue)
         {
             Description = description;
             AwardValue = awardValue;
@@ -17,15 +18,19 @@ namespace PokerSNTS.Domain.Entities
         public decimal? AwardValue { get; private set; }
         public virtual ICollection<Round> Rounds { get; private set; }
 
-        public override bool IsValid => Validate();
-
-        private bool Validate()
+        public override ValidationResult Validate()
         {
             var rankingValidator = new RankingValidator();
             var validationResult = rankingValidator.Validate(this);
             SetValidationResult(validationResult);
 
-            return validationResult.IsValid;
+            return validationResult;
+        }
+
+        public void Update(string description, decimal? awardValue)
+        {
+            Description = description;
+            AwardValue = awardValue;
         }
 
         private class RankingValidator : AbstractValidator<Ranking>

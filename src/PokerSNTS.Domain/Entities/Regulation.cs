@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 
 namespace PokerSNTS.Domain.Entities
 {
@@ -13,15 +14,13 @@ namespace PokerSNTS.Domain.Entities
 
         public string Description { get; private set; }
 
-        public override bool IsValid => Validate();
-
-        private bool Validate()
+        public override ValidationResult Validate()
         {
             var regulationValidator = new RegulationValidator();
             var validationResult = regulationValidator.Validate(this);
             SetValidationResult(validationResult);
 
-            return validationResult.IsValid;
+            return validationResult;
         }
 
         private class RegulationValidator : AbstractValidator<Regulation>

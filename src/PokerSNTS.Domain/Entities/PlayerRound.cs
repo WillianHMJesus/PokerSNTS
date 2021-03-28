@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using System;
 
 namespace PokerSNTS.Domain.Entities
@@ -13,6 +14,8 @@ namespace PokerSNTS.Domain.Entities
             RoundId = roundId;
         }
 
+        protected PlayerRound() { }
+
         public short Position { get; private set; }
         public short Punctuation { get; private set; }
         public Guid PlayerId { get; private set; }
@@ -20,16 +23,13 @@ namespace PokerSNTS.Domain.Entities
         public virtual Player Player { get; private set; }
         public virtual Round Round { get; private set; }
 
-
-        public override bool IsValid => Validate();
-
-        private bool Validate()
+        public override ValidationResult Validate()
         {
             var playerRoundaValidator = new PlayerRoundValidator();
             var validationResult = playerRoundaValidator.Validate(this);
             SetValidationResult(validationResult);
 
-            return validationResult.IsValid;
+            return validationResult;
         }
 
         private class PlayerRoundValidator : AbstractValidator<PlayerRound>

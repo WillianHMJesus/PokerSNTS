@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 
 namespace PokerSNTS.Domain.Entities
 {
@@ -15,15 +16,13 @@ namespace PokerSNTS.Domain.Entities
         public short Position { get; private set; }
         public short Punctuation { get; private set; }
 
-        public override bool IsValid => Validate();
-
-        private bool Validate()
+        public override ValidationResult Validate()
         {
             var rankingPunctuationValidator = new RankingPunctuationValidator();
             var validationResult = rankingPunctuationValidator.Validate(this);
             SetValidationResult(validationResult);
 
-            return validationResult.IsValid;
+            return validationResult;
         }
 
         private class RankingPunctuationValidator : AbstractValidator<RankingPunctuation>

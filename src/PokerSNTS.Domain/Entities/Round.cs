@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
 
@@ -19,15 +20,13 @@ namespace PokerSNTS.Domain.Entities
         public virtual ICollection<PlayerRound> PlayersRounds { get; private set; }
         public virtual ICollection<Ranking> Ranking { get; private set; }
 
-        public override bool IsValid => Validate();
-
-        private bool Validate()
+        public override ValidationResult Validate()
         {
             var roundValidator = new RoundValidator();
             var validationResult = roundValidator.Validate(this);
             SetValidationResult(validationResult);
 
-            return validationResult.IsValid;
+            return validationResult;
         }
 
         private class RoundValidator : AbstractValidator<Round>

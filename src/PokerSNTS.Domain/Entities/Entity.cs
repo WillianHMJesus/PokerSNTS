@@ -5,18 +5,29 @@ namespace PokerSNTS.Domain.Entities
 {
     public abstract class Entity
     {
-        public Entity()
+        public Entity() { Id = Guid.NewGuid(); }
+
+        public Guid Id { get; protected set; }
+        public DateTime Created { get; protected set; }
+        public DateTime? Updated { get; protected set; }
+        public bool Actived { get; protected set; }
+        public ValidationResult ValidationResult { get; protected set; }
+
+        public abstract ValidationResult Validate();
+
+        public void SetValidationResult(ValidationResult validationResult)
         {
-            Id = Guid.NewGuid();
+            if (ValidationResult != null)
+            {
+                foreach (var validationFailure in validationResult.Errors)
+                {
+                    ValidationResult.Errors.Add(validationFailure);
+                }
+
+                return;
+            }
+
+            ValidationResult = validationResult;
         }
-
-        public Guid Id { get; private set; }
-        public DateTime Created { get; private set; }
-        public DateTime? Updated { get; private set; }
-        public bool Actived { get; private set; }
-        public ValidationResult ValidationResult { get; private set; }
-        public abstract bool IsValid { get; }
-
-        public void SetValidationResult(ValidationResult validationResult) => ValidationResult = validationResult;
     }
 }
