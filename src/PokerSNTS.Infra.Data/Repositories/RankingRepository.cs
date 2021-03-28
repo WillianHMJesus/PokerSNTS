@@ -27,6 +27,11 @@ namespace PokerSNTS.Infra.Data.Repositories
             _context.Ranking.Update(ranking);
         }
 
+        public async Task<Ranking> GetById(Guid id)
+        {
+            return await _context.Ranking.FindAsync(id);
+        }
+
         public async Task<IEnumerable<Ranking>> GetAll()
         {
             return await _context.Ranking.AsNoTracking().ToListAsync();
@@ -34,7 +39,7 @@ namespace PokerSNTS.Infra.Data.Repositories
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _context.Dispose();
         }
     }
 }

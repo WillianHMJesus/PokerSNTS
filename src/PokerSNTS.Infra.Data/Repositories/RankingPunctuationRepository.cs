@@ -2,6 +2,7 @@
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Infra.Data.Contexts;
+using System;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Infra.Data.Repositories
@@ -23,6 +24,11 @@ namespace PokerSNTS.Infra.Data.Repositories
         public void Update(RankingPunctuation rankingPunctuation)
         {
             _context.RankingPunctuations.Update(rankingPunctuation);
+        }
+
+        public async Task<RankingPunctuation> GetById(Guid id)
+        {
+            return await _context.RankingPunctuations.FindAsync(id);
         }
 
         public async Task<RankingPunctuation> GetRankingPunctuationByPosition(short position)

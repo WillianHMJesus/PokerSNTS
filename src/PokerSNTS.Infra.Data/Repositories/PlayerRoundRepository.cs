@@ -1,6 +1,8 @@
 ﻿using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Infra.Data.Contexts;
+using System;
+using System.Threading.Tasks;
 
 namespace PokerSNTS.Infra.Data.Repositories
 {
@@ -21,6 +23,11 @@ namespace PokerSNTS.Infra.Data.Repositories
         public void Update(PlayerRound playerRound)
         {
             _context.PlayersRounds.Update(playerRound);
+        }
+
+        public async Task<PlayerRound> GetById(Guid id)
+        {
+            return await _context.PlayersRounds.FindAsync(id);
         }
 
         public void Dispose()

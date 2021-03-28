@@ -2,6 +2,7 @@
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Infra.Data.Contexts;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -24,6 +25,11 @@ namespace PokerSNTS.Infra.Data.Repositories
         public void Update(Regulation regulation)
         {
             _context.Regulations.Update(regulation);
+        }
+
+        public async Task<Regulation> GetById(Guid id)
+        {
+            return await _context.Regulations.FindAsync(id);
         }
 
         public async Task<IEnumerable<Regulation>> GetAll()
