@@ -1,4 +1,4 @@
-﻿using FluentValidation.Results;
+using FluentValidation.Results;
 using System;
 
 namespace PokerSNTS.Domain.Entities
@@ -16,17 +16,16 @@ namespace PokerSNTS.Domain.Entities
 
         public void SetValidationResult(ValidationResult validationResult)
         {
-            if (ValidationResult != null)
+            if (ValidationResult == null)
             {
-                foreach (var validationFailure in validationResult.Errors)
-                {
-                    ValidationResult.Errors.Add(validationFailure);
-                }
-
+                ValidationResult = validationResult;
                 return;
             }
-
-            ValidationResult = validationResult;
+            
+            foreach (var validationFailure in validationResult.Errors)
+            {
+                ValidationResult.Errors.Add(validationFailure);
+            }
         }
     }
 }
