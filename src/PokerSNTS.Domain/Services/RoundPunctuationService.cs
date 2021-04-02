@@ -29,16 +29,16 @@ namespace PokerSNTS.Domain.Services
             _notification = notification;
         }
 
-        public async Task<bool> Add(RoundPunctuation roundPunctuation)
+        public async Task<bool> AddAsync(RoundPunctuation roundPunctuation)
         {
             var validationResult = roundPunctuation.Validate();
             if(validationResult.IsValid)
             {
-                if(await ValidateRelationships (roundPunctuation))
+                if(await ValidateRelationshipsAsync(roundPunctuation))
                 {
                     _roundPunctuationRepository.Add(roundPunctuation);
 
-                    return await _unitOfWork.Commit();
+                    return await _unitOfWork.CommitAsync();
                 }
             }
 
@@ -47,9 +47,9 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<bool> Update(Guid id, RoundPunctuation roundPunctuation)
+        public async Task<bool> UpdateAsync(Guid id, RoundPunctuation roundPunctuation)
         {
-            var existingRoundPunctuation = await _roundPunctuationRepository.GetById(id);
+            var existingRoundPunctuation = await _roundPunctuationRepository.GetByIdAsync(id);
             if (existingRoundPunctuation == null) _notification.HandleNotification("DomainValidation", "Partida do jogador não encontrada.");
 
             if(!_notification.HasNotification())
@@ -58,11 +58,11 @@ namespace PokerSNTS.Domain.Services
                 var validationResult = existingRoundPunctuation.Validate();
                 if (validationResult.IsValid)
                 {
-                    if (await ValidateRelationships(roundPunctuation))
+                    if (await ValidateRelationshipsAsync(roundPunctuation))
                     {
                         _roundPunctuationRepository.Update(existingRoundPunctuation);
 
-                        return await _unitOfWork.Commit();
+                        return await _unitOfWork.CommitAsync();
                     }
                 }
 
@@ -72,17 +72,17 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        private async Task<bool> ValidateRelationships(RoundPunctuation roundPunctuation)
+        private async Task<bool> ValidateRelationshipsAsync(RoundPunctuation roundPunctuation)
         {
-            var validationPlayer = await ValidatePlayerExists(roundPunctuation.PlayerId);
-            var validationRound = await ValidateRoundExists(roundPunctuation.RoundId);
+            var validationPlayer = await ValidatePlayerExistsAsync(roundPunctuation.PlayerId);
+            var validationRound = await ValidateRoundExistsAsync(roundPunctuation.RoundId);
 
             return validationPlayer && validationRound;
         }
 
-        private async Task<bool> ValidatePlayerExists(Guid playerId)
+        private async Task<bool> ValidatePlayerExistsAsync(Guid playerId)
         {
-            var player = await _playerRepository.GetById(playerId);
+            var player = await _playerRepository.GetByIdAsync(playerId);
             if(player == null)
             {
                 _notification.HandleNotification("DomainValidation", "Jogador não encontrado.");
@@ -93,9 +93,9 @@ namespace PokerSNTS.Domain.Services
             return true;
         }
 
-        private async Task<bool> ValidateRoundExists(Guid roundId)
+        private async Task<bool> ValidateRoundExistsAsync(Guid roundId)
         {
-            var round = await _roundRepository.GetById(roundId);
+            var round = await _roundRepository.GetByIdAsync(roundId);
             if(round == null)
             {
                 _notification.HandleNotification("DomainValidation", "Rodada não encontrada.");

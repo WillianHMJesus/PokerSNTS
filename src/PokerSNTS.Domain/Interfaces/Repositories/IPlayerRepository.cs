@@ -6,6 +6,6 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
 {
     public interface IPlayerRepository : IRepository<Player>
     {
-        Task<IEnumerable<Player>> GetAll();
+        Task<IEnumerable<Player>> GetAllAsync();
     }
 }

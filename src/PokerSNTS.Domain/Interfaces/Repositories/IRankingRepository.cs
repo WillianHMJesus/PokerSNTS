@@ -6,6 +6,6 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
 {
     public interface IRankingRepository : IRepository<Ranking>
     {
-        Task<IEnumerable<Ranking>> GetAll();
+        Task<IEnumerable<Ranking>> GetAllAsync();
     }
 }

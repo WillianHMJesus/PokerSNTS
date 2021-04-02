@@ -8,6 +8,6 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
     {
         void Add(T entity);
         void Update(T entity);
-        Task<T> GetById(Guid id);
+        Task<T> GetByIdAsync(Guid id);
     }
 }

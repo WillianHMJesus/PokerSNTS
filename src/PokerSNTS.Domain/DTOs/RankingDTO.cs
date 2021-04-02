@@ -1,17 +1,14 @@
-﻿using PokerSNTS.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 
 namespace PokerSNTS.Domain.DTOs
 {
     public class RankingDTO
     {
-        public RankingDTO(Ranking ranking)
+        public RankingDTO(Guid id, string description, decimal? awardValue)
         {
-            Id = ranking.Id;
-            Description = ranking.Description;
-            AwardValue = ranking.AwardValue;
+            Id = id;
+            Description = description;
+            AwardValue = awardValue;
         }
 
         public Guid Id { get; private set; }

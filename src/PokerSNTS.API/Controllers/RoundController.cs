@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
+using PokerSNTS.Domain.Adapters;
+using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Notifications;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.API.Controllers
@@ -22,19 +25,13 @@ namespace PokerSNTS.API.Controllers
             _roundPunctuationService = roundPunctuationService;
         }
 
-        [HttpGet("{rankingId}")]
-        public async Task<IActionResult> GetAsync(Guid rankingId)
-        {
-            return Response(await _roundService.GetRoundByRankingId(rankingId));
-        }
-
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] RoundInputModel model)
         {
             if (ModelState.IsValid)
             {
                 var round = new Round(model.Description, model.Date, model.RankingId);
-                var result = await _roundService.Add(round);
+                var result = await _roundService.AddAsync(round);
 
                 return Response(result);
             }
@@ -57,7 +54,7 @@ namespace PokerSNTS.API.Controllers
             if (ModelState.IsValid)
             {
                 var round = new Round(model.Description, model.Date, model.RankingId);
-                var result = await _roundService.Update(id, round);
+                var result = await _roundService.UpdateAsync(id, round);
 
                 return Response(result);
             }
@@ -67,13 +64,26 @@ namespace PokerSNTS.API.Controllers
             return Response();
         }
 
+        [HttpGet("{rankingId}")]
+        public async Task<IActionResult> GetAsync(Guid rankingId)
+        {
+            var roundsDTO = new List<RoundDTO>();
+            var rounds = await _roundService.GetRoundByRankingIdAsync(rankingId);
+            foreach (var round in rounds)
+            {
+                RoundAdapter.ToRoundDTO(round);
+            }
+
+            return Response(roundsDTO);
+        }
+
         [HttpPost("Punctuation")]
         public async Task<IActionResult> PostPunctuationAsync([FromBody] RoundPunctuationInputModel model)
         {
             if (ModelState.IsValid)
             {
                 var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
-                var result = await _roundPunctuationService.Add(roundPunctuation);
+                var result = await _roundPunctuationService.AddAsync(roundPunctuation);
 
                 return Response(result);
             }
@@ -96,7 +106,7 @@ namespace PokerSNTS.API.Controllers
             if (ModelState.IsValid)
             {
                 var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
-                var result = await _roundPunctuationService.Update(id, roundPunctuation);
+                var result = await _roundPunctuationService.UpdateAsync(id, roundPunctuation);
 
                 return Response(result);
             }

@@ -1,15 +1,14 @@
-﻿using PokerSNTS.Domain.Entities;
-using System;
+﻿using System;
 
 namespace PokerSNTS.Domain.DTOs
 {
     public class RankingPunctuationDTO
     {
-        public RankingPunctuationDTO(RankingPunctuation rankingPunctuation)
+        public RankingPunctuationDTO(Guid id, short position, short punctuation)
         {
-            Id = rankingPunctuation.Id;
-            Position = rankingPunctuation.Position;
-            Punctuation = rankingPunctuation.Punctuation;
+            Id = id;
+            Position = position;
+            Punctuation = punctuation;
         }
 
         public Guid Id { get; private set; }

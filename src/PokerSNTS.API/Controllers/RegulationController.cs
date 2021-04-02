@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
+using PokerSNTS.Domain.Adapters;
 using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
@@ -21,26 +22,13 @@ namespace PokerSNTS.API.Controllers
             _regulationService = regulationService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAsync()
-        {
-            var regulationsDTO = new List<RegulationDTO>();
-            var regulations = await _regulationService.GetAll();
-            foreach (var regulation in regulations)
-            {
-                regulationsDTO.Add(new RegulationDTO(regulation));
-            }
-
-            return Response(regulationsDTO);
-        }
-
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] RegulationInputModel model)
         {
             if (ModelState.IsValid)
             {
                 var regulation = new Regulation(model.Description);
-                var result = await _regulationService.Add(regulation);
+                var result = await _regulationService.AddAsync(regulation);
 
                 return Response(result);
             }
@@ -63,7 +51,7 @@ namespace PokerSNTS.API.Controllers
             if (ModelState.IsValid)
             {
                 var regulation = new Regulation(model.Description);
-                var result = await _regulationService.Update(id, regulation);
+                var result = await _regulationService.UpdateAsync(id, regulation);
 
                 return Response(result);
             }
@@ -71,6 +59,19 @@ namespace PokerSNTS.API.Controllers
             NotifyModelStateError();
 
             return Response();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
+        {
+            var regulationsDTO = new List<RegulationDTO>();
+            var regulations = await _regulationService.GetAllAsync();
+            foreach (var regulation in regulations)
+            {
+                regulationsDTO.Add(RegulationAdapter.ToRegulationDTO(regulation));
+            }
+
+            return Response(regulationsDTO);
         }
     }
 }

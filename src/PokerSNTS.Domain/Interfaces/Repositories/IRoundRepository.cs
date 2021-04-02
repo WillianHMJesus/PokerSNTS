@@ -7,6 +7,6 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
 {
     public interface IRoundRepository : IRepository<Round>
     {
-        Task<IEnumerable<Round>> GetRoundByRankingId(Guid rankingId);
+        Task<IEnumerable<Round>> GetRoundByRankingIdAsync(Guid rankingId);
     }
 }

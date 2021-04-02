@@ -4,6 +4,6 @@ namespace PokerSNTS.Domain.Interfaces.UnitOfWork
 {
     public interface IUnitOfWork
     {
-        Task<bool> Commit();
+        Task<bool> CommitAsync();
     }
 }

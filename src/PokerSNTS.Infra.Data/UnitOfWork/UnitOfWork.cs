@@ -15,7 +15,7 @@ namespace PokerSNTS.Infra.Data.UnitOfWork
             _context = context;
         }
 
-        public async Task<bool> Commit()
+        public async Task<bool> CommitAsync()
         {
             foreach (var entry in _context.ChangeTracker.Entries())
             {

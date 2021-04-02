@@ -27,12 +27,12 @@ namespace PokerSNTS.Infra.Data.Repositories
             _context.Ranking.Update(ranking);
         }
 
-        public async Task<Ranking> GetById(Guid id)
+        public async Task<Ranking> GetByIdAsync(Guid id)
         {
             return await _context.Ranking.FindAsync(id);
         }
 
-        public async Task<IEnumerable<Ranking>> GetAll()
+        public async Task<IEnumerable<Ranking>> GetAllAsync()
         {
             return await _context.Ranking.AsNoTracking().ToListAsync();
         }

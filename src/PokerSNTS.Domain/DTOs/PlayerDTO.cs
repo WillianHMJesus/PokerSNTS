@@ -1,14 +1,13 @@
-﻿using PokerSNTS.Domain.Entities;
-using System;
+﻿using System;
 
 namespace PokerSNTS.Domain.DTOs
 {
     public class PlayerDTO
     {
-        public PlayerDTO(Player player)
+        public PlayerDTO(Guid id, string name)
         {
-            Id = player.Id;
-            Name = player.Name;
+            Id = id;
+            Name = name;
         }
 
         public Guid Id { get; private set; }

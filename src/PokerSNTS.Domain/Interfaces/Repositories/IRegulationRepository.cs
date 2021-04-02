@@ -6,6 +6,6 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
 {
     public interface IRegulationRepository : IRepository<Regulation>
     {
-        Task<IEnumerable<Regulation>> GetAll();
+        Task<IEnumerable<Regulation>> GetAllAsync();
     }
 }

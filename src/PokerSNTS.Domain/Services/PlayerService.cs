@@ -1,5 +1,4 @@
-﻿using PokerSNTS.Domain.DTOs;
-using PokerSNTS.Domain.Entities;
+﻿using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
@@ -25,14 +24,14 @@ namespace PokerSNTS.Domain.Services
             _notification = notification;
         }
 
-        public async Task<bool> Add(Player player)
+        public async Task<bool> AddAsync(Player player)
         {
             var validationResult = player.Validate();
             if (validationResult.IsValid)
             {
                 _playerRepository.Add(player);
 
-                return await _unitOfWork.Commit();
+                return await _unitOfWork.CommitAsync();
             }
 
             _notification.HandleNotification(validationResult);
@@ -40,9 +39,9 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<bool> Update(Guid id, Player player)
+        public async Task<bool> UpdateAsync(Guid id, Player player)
         {
-            var existingPlayer = await _playerRepository.GetById(id);
+            var existingPlayer = await _playerRepository.GetByIdAsync(id);
             if (existingPlayer == null) _notification.HandleNotification("DomainValidation", "Jogador não encontrado.");
 
             if(!_notification.HasNotification())
@@ -53,7 +52,7 @@ namespace PokerSNTS.Domain.Services
                 {
                     _playerRepository.Update(existingPlayer);
 
-                    return await _unitOfWork.Commit();
+                    return await _unitOfWork.CommitAsync();
                 }
 
                 _notification.HandleNotification(validationResult);
@@ -62,16 +61,9 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<IEnumerable<PlayerDTO>> GetAll()
+        public async Task<IEnumerable<Player>> GetAllAsync()
         {
-            var playersDTO = new List<PlayerDTO>();
-            var players = await _playerRepository.GetAll();
-            foreach (var player in players)
-            {
-                playersDTO.Add(new PlayerDTO(player));
-            }
-
-            return await Task.FromResult(playersDTO);
+            return await _playerRepository.GetAllAsync();
         }
     }
 }

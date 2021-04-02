@@ -1,14 +1,13 @@
-﻿using PokerSNTS.Domain.Entities;
-using System;
+﻿using System;
 
 namespace PokerSNTS.Domain.DTOs
 {
     public class RegulationDTO
     {
-        public RegulationDTO(Regulation regulation)
+        public RegulationDTO(Guid id, string description)
         {
-            Id = regulation.Id;
-            Description = regulation.Description;
+            Id = id;
+            Description = description;
         }
 
         public Guid Id { get; private set; }

@@ -25,7 +25,7 @@ namespace PokerSNTS.Infra.Data.Repositories
             _context.RoundsPunctuations.Update(roundPunctuation);
         }
 
-        public async Task<RoundPunctuation> GetById(Guid id)
+        public async Task<RoundPunctuation> GetByIdAsync(Guid id)
         {
             return await _context.RoundsPunctuations.FindAsync(id);
         }

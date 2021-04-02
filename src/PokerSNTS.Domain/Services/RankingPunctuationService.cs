@@ -24,14 +24,14 @@ namespace PokerSNTS.Domain.Services
             _notification = notification;
         }
 
-        public async Task<bool> Add(RankingPunctuation rankingPunctuation)
+        public async Task<bool> AddAsync(RankingPunctuation rankingPunctuation)
         {
             var validationResult = rankingPunctuation.Validate();
             if (validationResult.IsValid)
             {
                 _rankingPunctuationRepository.Add(rankingPunctuation);
 
-                return await _unitOfWork.Commit();
+                return await _unitOfWork.CommitAsync();
             }
 
             _notification.HandleNotification(validationResult);
@@ -39,9 +39,9 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<bool> Update(Guid id, RankingPunctuation rankingPunctuation)
+        public async Task<bool> UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
         {
-            var existingRankingPunctuation = await _rankingPunctuationRepository.GetById(id);
+            var existingRankingPunctuation = await _rankingPunctuationRepository.GetByIdAsync(id);
             if (existingRankingPunctuation == null) _notification.HandleNotification("DomainValidation", "Pontuação do ranking não foi encontrada.");
 
             if(!_notification.HasNotification())
@@ -52,7 +52,7 @@ namespace PokerSNTS.Domain.Services
                 {
                     _rankingPunctuationRepository.Update(existingRankingPunctuation);
 
-                    return await _unitOfWork.Commit();
+                    return await _unitOfWork.CommitAsync();
                 }
 
                 _notification.HandleNotification(validationResult);
@@ -61,14 +61,14 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<IEnumerable<RankingPunctuation>> GetAll()
+        public async Task<IEnumerable<RankingPunctuation>> GetAllAsync()
         {
-            return await _rankingPunctuationRepository.GetAll();
+            return await _rankingPunctuationRepository.GetAllAsync();
         }
 
-        public async Task<RankingPunctuation> GetRankingPunctuationByPosition(short position)
+        public async Task<RankingPunctuation> GetRankingPunctuationByPositionAsync(short position)
         {
-            return await _rankingPunctuationRepository.GetRankingPunctuationByPosition(position);
+            return await _rankingPunctuationRepository.GetRankingPunctuationByPositionAsync(position);
         }
     }
 }

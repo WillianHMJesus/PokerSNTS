@@ -7,8 +7,8 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IRegulationService
     {
-        Task<bool> Add(Regulation regulation);
-        Task<bool> Update(Guid id, Regulation regulation);
-        Task<IEnumerable<Regulation>> GetAll();
+        Task<bool> AddAsync(Regulation regulation);
+        Task<bool> UpdateAsync(Guid id, Regulation regulation);
+        Task<IEnumerable<Regulation>> GetAllAsync();
     }
 }

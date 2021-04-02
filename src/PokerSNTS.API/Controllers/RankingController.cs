@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
+using PokerSNTS.Domain.Adapters;
 using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
@@ -24,19 +25,14 @@ namespace PokerSNTS.API.Controllers
             _rankingPunctuationService = rankingPunctuationService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAsync()
-        {
-            return Response(await _rankingService.GetAll());
-        }
-
+        #region Ranking
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] RankingInputModel model)
         {
             if (ModelState.IsValid)
             {
                 var ranking = new Ranking(model.Description, model.AwardValue);
-                var result = await _rankingService.Add(ranking);
+                var result = await _rankingService.AddAsync(ranking);
 
                 return Response(result);
             }
@@ -59,7 +55,7 @@ namespace PokerSNTS.API.Controllers
             if (ModelState.IsValid)
             {
                 var ranking = new Ranking(model.Description, model.AwardValue);
-                var result = await _rankingService.Update(id, ranking);
+                var result = await _rankingService.UpdateAsync(id, ranking);
 
                 return Response(result);
             }
@@ -69,26 +65,28 @@ namespace PokerSNTS.API.Controllers
             return Response();
         }
 
-        [HttpGet("Punctuation")]
-        public async Task<IActionResult> GetPunctuationAsync()
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
         {
-            var rankingPunctuationsDTO = new List<RankingPunctuationDTO>();
-            var rankingPunctuations = await _rankingPunctuationService.GetAll();
-            foreach (var rankingPunctuation in rankingPunctuations)
+            var rankingDTO = new List<RankingDTO>();
+            var rankings = await _rankingService.GetAllAsync();
+            foreach (var ranking in rankings)
             {
-                rankingPunctuationsDTO.Add(new RankingPunctuationDTO(rankingPunctuation));
+                rankingDTO.Add(RankingAdapter.ToRankingDTO(ranking));
             }
 
-            return Response(rankingPunctuationsDTO);
+            return Response(rankingDTO);
         }
+        #endregion
 
+        #region Punctuation
         [HttpPost("Punctuation")]
         public async Task<IActionResult> PostAsync([FromBody] RankingPunctuationInputModel model)
         {
             if (ModelState.IsValid)
             {
                 var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
-                var result = await _rankingPunctuationService.Add(rankingPunctuation);
+                var result = await _rankingPunctuationService.AddAsync(rankingPunctuation);
 
                 return Response(result);
             }
@@ -111,7 +109,7 @@ namespace PokerSNTS.API.Controllers
             if (ModelState.IsValid)
             {
                 var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
-                var result = await _rankingPunctuationService.Update(id, rankingPunctuation);
+                var result = await _rankingPunctuationService.UpdateAsync(id, rankingPunctuation);
 
                 return Response(result);
             }
@@ -121,14 +119,29 @@ namespace PokerSNTS.API.Controllers
             return Response();
         }
 
+        [HttpGet("Punctuation")]
+        public async Task<IActionResult> GetPunctuationAsync()
+        {
+            var rankingPunctuationsDTO = new List<RankingPunctuationDTO>();
+            var rankingPunctuations = await _rankingPunctuationService.GetAllAsync();
+            foreach (var rankingPunctuation in rankingPunctuations)
+            {
+                rankingPunctuationsDTO.Add(RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation));
+                                           
+            }
+
+            return Response(rankingPunctuationsDTO);
+        }
+
         [HttpGet("Punctuation/{position}")]
         public async Task<IActionResult> GetPunctuationByPositionAsync(short position)
         {
-            var rankingPunctuation = await _rankingPunctuationService.GetRankingPunctuationByPosition(position);
+            var rankingPunctuation = await _rankingPunctuationService.GetRankingPunctuationByPositionAsync(position);
             if (rankingPunctuation == null) return Response();
-            var rankingPunctuationDTO = new RankingPunctuationDTO(rankingPunctuation);
+            var rankingPunctuationDTO = RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation);
 
             return Response(rankingPunctuationDTO);
         }
+        #endregion
     }
 }

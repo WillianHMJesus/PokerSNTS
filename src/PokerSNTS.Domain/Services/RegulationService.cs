@@ -24,14 +24,14 @@ namespace PokerSNTS.Domain.Services
             _notification = notification;
         }
 
-        public async Task<bool> Add(Regulation regulation)
+        public async Task<bool> AddAsync(Regulation regulation)
         {
             var validationResult = regulation.Validate();
             if(validationResult.IsValid)
             {
                 _regulationRepository.Add(regulation);
 
-                return await _unitOfWork.Commit();
+                return await _unitOfWork.CommitAsync();
             }
 
             _notification.HandleNotification(validationResult);
@@ -39,9 +39,9 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<bool> Update(Guid id, Regulation regulation)
+        public async Task<bool> UpdateAsync(Guid id, Regulation regulation)
         {
-            var existingRegulation = await _regulationRepository.GetById(id);
+            var existingRegulation = await _regulationRepository.GetByIdAsync(id);
             if (existingRegulation == null) _notification.HandleNotification("DomainValidation", "Regulamento não encontrado");
 
             if(!_notification.HasNotification())
@@ -52,7 +52,7 @@ namespace PokerSNTS.Domain.Services
                 {
                     _regulationRepository.Update(existingRegulation);
 
-                    return await _unitOfWork.Commit();
+                    return await _unitOfWork.CommitAsync();
                 }
 
                 _notification.HandleNotification(validationResult);
@@ -61,9 +61,9 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<IEnumerable<Regulation>> GetAll()
+        public async Task<IEnumerable<Regulation>> GetAllAsync()
         {
-            return await _regulationRepository.GetAll();
+            return await _regulationRepository.GetAllAsync();
         }
     }
 }
