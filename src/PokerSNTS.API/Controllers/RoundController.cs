@@ -68,7 +68,7 @@ namespace PokerSNTS.API.Controllers
         }
 
         [HttpPost("Punctuation")]
-        public async Task<IActionResult> PostPunctuation([FromBody] RoundPunctuationInputModel model)
+        public async Task<IActionResult> PostPunctuationAsync([FromBody] RoundPunctuationInputModel model)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace PokerSNTS.API.Controllers
         }
 
         [HttpPut("Punctuation/{id}")]
-        public async Task<IActionResult> PutPunctuation(Guid id, [FromBody] RoundPunctuationInputModel model)
+        public async Task<IActionResult> PutPunctuationAsync(Guid id, [FromBody] RoundPunctuationInputModel model)
         {
             if (id.Equals(default(Guid)))
             {

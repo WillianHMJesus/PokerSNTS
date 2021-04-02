@@ -4,6 +4,7 @@ using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -58,6 +59,11 @@ namespace PokerSNTS.Domain.Services
             }
 
             return false;
+        }
+
+        public async Task<IEnumerable<RankingPunctuation>> GetAll()
+        {
+            return await _rankingPunctuationRepository.GetAll();
         }
 
         public async Task<RankingPunctuation> GetRankingPunctuationByPosition(short position)
