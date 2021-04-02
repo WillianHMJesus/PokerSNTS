@@ -17,8 +17,8 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .HasMaxLength(100);
 
             builder.HasMany(x => x.Rounds)
-                .WithMany(x => x.Ranking)
-                .UsingEntity(x => x.ToTable("RankingRounds"));
+                .WithOne(x => x.Ranking)
+                .HasForeignKey(x => x.RankingId);
 
             builder.Ignore(x => x.ValidationResult);
         }

@@ -1,4 +1,5 @@
-﻿using PokerSNTS.Domain.Entities;
+﻿using PokerSNTS.Domain.DTOs;
+using PokerSNTS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,6 @@ namespace PokerSNTS.Domain.Interfaces.Services
     {
         Task<bool> Add(Round round);
         Task<bool> Update(Guid id, Round round);
-        Task<IEnumerable<Round>> GetRoundByRankingId(Guid rankingId);
+        Task<IEnumerable<RoundDTO>> GetRoundByRankingId(Guid rankingId);
     }
 }

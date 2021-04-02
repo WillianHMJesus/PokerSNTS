@@ -1,8 +1,10 @@
-﻿using PokerSNTS.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Infra.Data.Contexts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Infra.Data.Repositories
@@ -33,9 +35,7 @@ namespace PokerSNTS.Infra.Data.Repositories
 
         public async Task<IEnumerable<Round>> GetRoundByRankingId(Guid rankingId)
         {
-            var ranking = await _context.Ranking.FindAsync(rankingId);
-
-            return await Task.FromResult(ranking.Rounds);
+            return await _context.Rounds.Where(x => x.RankingId == rankingId).ToListAsync();
         }
 
         public void Dispose()

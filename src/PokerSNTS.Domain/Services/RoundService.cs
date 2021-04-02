@@ -1,4 +1,5 @@
-﻿using PokerSNTS.Domain.Entities;
+﻿using PokerSNTS.Domain.DTOs;
+using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
@@ -12,14 +13,17 @@ namespace PokerSNTS.Domain.Services
     public class RoundService : IRoundService
     {
         private readonly IRoundRepository _roundRepository;
+        private readonly IRankingRepository _rankingRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDomainNotificationHandler _notification;
 
         public RoundService(IRoundRepository roundRepository,
+            IRankingRepository rankingRepository,
             IUnitOfWork unitOfWork,
             IDomainNotificationHandler notification)
         {
             _roundRepository = roundRepository;
+            _rankingRepository = rankingRepository;
             _unitOfWork = unitOfWork;
             _notification = notification;
         }
@@ -29,9 +33,12 @@ namespace PokerSNTS.Domain.Services
             var validationResult = round.Validate();
             if(validationResult.IsValid)
             {
-                _roundRepository.Add(round);
+                if(await ValidateRankingExists(round.RankingId))
+                {
+                    _roundRepository.Add(round);
 
-                return await _unitOfWork.Commit();
+                    return await _unitOfWork.Commit();
+                }
             }
 
             _notification.HandleNotification(validationResult);
@@ -46,13 +53,16 @@ namespace PokerSNTS.Domain.Services
 
             if(!_notification.HasNotification())
             {
-                existingRound.Update(round.Description, round.Date);
+                existingRound.Update(round.Description, round.Date, round.RankingId);
                 var validationResult = existingRound.Validate();
                 if (validationResult.IsValid)
                 {
-                    _roundRepository.Update(existingRound);
+                    if (await ValidateRankingExists(round.RankingId))
+                    {
+                        _roundRepository.Update(existingRound);
 
-                    return await _unitOfWork.Commit();
+                        return await _unitOfWork.Commit();
+                    }
                 }
 
                 _notification.HandleNotification(validationResult);
@@ -61,9 +71,29 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<IEnumerable<Round>> GetRoundByRankingId(Guid rankingId)
+        public async Task<IEnumerable<RoundDTO>> GetRoundByRankingId(Guid rankingId)
         {
-            return await _roundRepository.GetRoundByRankingId(rankingId);
+            var roundsDTO = new List<RoundDTO>();
+            var rounds = await _roundRepository.GetRoundByRankingId(rankingId);
+            foreach (var round in rounds)
+            {
+                roundsDTO.Add(new RoundDTO(round));
+            }
+
+            return await Task.FromResult(roundsDTO);
+        }
+
+        private async Task<bool> ValidateRankingExists(Guid rankingId)
+        {
+            var ranking = await _rankingRepository.GetById(rankingId);
+            if (ranking == null)
+            {
+                _notification.HandleNotification("DomainValidation", "Ranking não encontrado.");
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

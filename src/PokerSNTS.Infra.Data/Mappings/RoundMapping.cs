@@ -23,9 +23,9 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .WithOne(x => x.Round)
                 .HasForeignKey(x => x.RoundId);
 
-            builder.HasMany(x => x.Ranking)
+            builder.HasOne(x => x.Ranking)
                 .WithMany(x => x.Rounds)
-                .UsingEntity(x => x.ToTable("RankingRounds"));
+                .HasForeignKey(x => x.RankingId);
 
             builder.Ignore(x => x.ValidationResult);
         }
