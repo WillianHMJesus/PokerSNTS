@@ -14,7 +14,7 @@ namespace PokerSNTS.Domain.Entities
         protected Player() { }
 
         public string Name { get; private set; }
-        public virtual ICollection<PlayerRound> PlayersRounds { get; private set; }
+        public virtual ICollection<RoundPunctuation> RoundsPunctuations { get; private set; }
 
         public override ValidationResult Validate()
         {

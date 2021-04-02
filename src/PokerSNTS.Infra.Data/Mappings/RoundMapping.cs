@@ -19,7 +19,7 @@ namespace PokerSNTS.Infra.Data.Mappings
             builder.Property(x => x.Date)
                 .HasColumnType("date");
 
-            builder.HasMany(x => x.PlayersRounds)
+            builder.HasMany(x => x.RoundsPunctuations)
                 .WithOne(x => x.Round)
                 .HasForeignKey(x => x.RoundId);
 

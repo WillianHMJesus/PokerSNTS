@@ -12,7 +12,8 @@ namespace PokerSNTS.API.Controllers
     {
         private readonly IPlayerService _playerService;
 
-        public PlayerController(IPlayerService playerService, IDomainNotificationHandler notifications)
+        public PlayerController(IPlayerService playerService, 
+            IDomainNotificationHandler notifications)
             : base(notifications)
         {
             _playerService = playerService;

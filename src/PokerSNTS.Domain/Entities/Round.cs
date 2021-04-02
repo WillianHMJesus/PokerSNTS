@@ -20,7 +20,7 @@ namespace PokerSNTS.Domain.Entities
         public DateTime Date { get; private set; }
         public Guid RankingId { get; private set; }
         public virtual Ranking Ranking { get; private set; }
-        public virtual ICollection<PlayerRound> PlayersRounds { get; private set; }
+        public virtual ICollection<RoundPunctuation> RoundsPunctuations { get; private set; }
 
         public override ValidationResult Validate()
         {
