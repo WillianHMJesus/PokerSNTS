@@ -8,30 +8,29 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.API.Controllers
 {
-    [ApiController]
-    public class RankingController : BaseController
+    public class PlayerController : BaseController
     {
-        private readonly IRankingService _rankingService;
+        private readonly IPlayerService _playerService;
 
-        public RankingController(IRankingService rankingService,
-            IDomainNotificationHandler notification) : base(notification)
+        public PlayerController(IPlayerService playerService, IDomainNotificationHandler notifications)
+            : base(notifications)
         {
-            _rankingService = rankingService;
+            _playerService = playerService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            return Response(await _rankingService.GetAll());
+            return Response(await _playerService.GetAll());
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody] RankingInputModel model)
+        public async Task<IActionResult> PostAsync([FromBody] PlayerInputModel model)
         {
             if (ModelState.IsValid)
             {
-                var ranking = new Ranking(model.Description, model.AwardValue);
-                var result = await _rankingService.Add(ranking);
+                var player = new Player(model.Name);
+                var result = await _playerService.Add(player);
 
                 return Response(result);
             }
@@ -42,19 +41,19 @@ namespace PokerSNTS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(Guid id, [FromBody] RankingInputModel model)
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] PlayerInputModel model)
         {
             if (id.Equals(default(Guid)))
             {
-                AddError("O Id do ranking não foi informada.");
+                AddError("O Id do jogador não foi informado.");
 
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var ranking = new Ranking(model.Description, model.AwardValue);
-                var result = await _rankingService.Update(id, ranking);
+                var player = new Player(model.Name);
+                var result = await _playerService.Update(id, player);
 
                 return Response(result);
             }

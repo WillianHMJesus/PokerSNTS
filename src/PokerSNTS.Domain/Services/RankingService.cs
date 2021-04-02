@@ -65,8 +65,8 @@ namespace PokerSNTS.Domain.Services
         public async Task<IEnumerable<RankingDTO>> GetAll()
         {
             var rankingDTO = new List<RankingDTO>();
-            var taskRanking = await _rankingRepository.GetAll();
-            foreach (var ranking in taskRanking)
+            var rankings = await _rankingRepository.GetAll();
+            foreach (var ranking in rankings)
             {
                 rankingDTO.Add(new RankingDTO(ranking));
             }

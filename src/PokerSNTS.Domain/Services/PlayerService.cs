@@ -1,4 +1,5 @@
-﻿using PokerSNTS.Domain.Entities;
+﻿using PokerSNTS.Domain.DTOs;
+using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
@@ -61,9 +62,16 @@ namespace PokerSNTS.Domain.Services
             return false;
         }
 
-        public async Task<IEnumerable<Player>> GetAll()
+        public async Task<IEnumerable<PlayerDTO>> GetAll()
         {
-            return await _playerRepository.GetAll();
+            var playersDTO = new List<PlayerDTO>();
+            var players = await _playerRepository.GetAll();
+            foreach (var player in players)
+            {
+                playersDTO.Add(new PlayerDTO(player));
+            }
+
+            return await Task.FromResult(playersDTO);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 namespace PokerSNTS.API.Controllers
 {
     [Produces("application/json")]
+    [Route("api/[controller]")]
     public abstract class BaseController : ControllerBase
     {
         private readonly IDomainNotificationHandler _notifications;
