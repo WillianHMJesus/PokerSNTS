@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
 using PokerSNTS.Domain.Adapters;
-using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Notifications;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.API.Controllers
@@ -27,10 +26,11 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var regulation = new Regulation(model.Description);
-                var result = await _regulationService.AddAsync(regulation);
+                var regulation = await _regulationService.AddAsync(new Regulation(model.Description));
+                if (regulation == null) return Response();
+                var regulationDTO = RegulationAdapter.ToRegulationDTO(regulation);
 
-                return Response(result);
+                return Response(regulationDTO);
             }
 
             NotifyModelStateError();
@@ -44,16 +44,16 @@ namespace PokerSNTS.API.Controllers
             if (id.Equals(default(Guid)))
             {
                 AddError("O Id do regulamento não foi informado.");
-
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var regulation = new Regulation(model.Description);
-                var result = await _regulationService.UpdateAsync(id, regulation);
+                var regulation = await _regulationService.UpdateAsync(id, new Regulation(model.Description));
+                if (regulation == null) return Response();
+                var regulationDTO = RegulationAdapter.ToRegulationDTO(regulation);
 
-                return Response(result);
+                return Response(regulationDTO);
             }
 
             NotifyModelStateError();
@@ -64,12 +64,8 @@ namespace PokerSNTS.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var regulationsDTO = new List<RegulationDTO>();
             var regulations = await _regulationService.GetAllAsync();
-            foreach (var regulation in regulations)
-            {
-                regulationsDTO.Add(RegulationAdapter.ToRegulationDTO(regulation));
-            }
+            var regulationsDTO = regulations.Select(x => RegulationAdapter.ToRegulationDTO(x)).ToList();
 
             return Response(regulationsDTO);
         }

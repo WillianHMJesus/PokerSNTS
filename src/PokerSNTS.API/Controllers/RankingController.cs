@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
 using PokerSNTS.Domain.Adapters;
-using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Notifications;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.API.Controllers
@@ -31,10 +30,11 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var ranking = new Ranking(model.Description, model.AwardValue);
-                var result = await _rankingService.AddAsync(ranking);
+                var ranking = await _rankingService.AddAsync(new Ranking(model.Description, model.AwardValue));
+                if (ranking == null) return Response();
+                var rankingDTO = RankingAdapter.ToRankingDTO(ranking);
 
-                return Response(result);
+                return Response(rankingDTO);
             }
 
             NotifyModelStateError();
@@ -48,16 +48,16 @@ namespace PokerSNTS.API.Controllers
             if (id.Equals(default(Guid)))
             {
                 AddError("O Id do ranking não foi informada.");
-
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var ranking = new Ranking(model.Description, model.AwardValue);
-                var result = await _rankingService.UpdateAsync(id, ranking);
+                var ranking = await _rankingService.UpdateAsync(id, new Ranking(model.Description, model.AwardValue));
+                if (ranking == null) return Response();
+                var rankingDTO = RankingAdapter.ToRankingDTO(ranking);
 
-                return Response(result);
+                return Response(rankingDTO);
             }
 
             NotifyModelStateError();
@@ -68,12 +68,8 @@ namespace PokerSNTS.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var rankingDTO = new List<RankingDTO>();
-            var rankings = await _rankingService.GetAllAsync();
-            foreach (var ranking in rankings)
-            {
-                rankingDTO.Add(RankingAdapter.ToRankingDTO(ranking));
-            }
+            var ranking = await _rankingService.GetAllAsync();
+            var rankingDTO = ranking.Select(x => RankingAdapter.ToRankingDTO(x)).ToList();
 
             return Response(rankingDTO);
         }
@@ -85,10 +81,11 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
-                var result = await _rankingPunctuationService.AddAsync(rankingPunctuation);
+                var rankingPunctuation = await _rankingPunctuationService.AddAsync(new RankingPunctuation(model.Position, model.Punctuation));
+                if (rankingPunctuation == null) return Response();
+                var rankingPunctuationDTO = RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation);
 
-                return Response(result);
+                return Response(rankingPunctuationDTO);
             }
 
             NotifyModelStateError();
@@ -102,16 +99,16 @@ namespace PokerSNTS.API.Controllers
             if (id.Equals(default(Guid)))
             {
                 AddError("O Id da pontuação do ranking não foi informada.");
-
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
-                var result = await _rankingPunctuationService.UpdateAsync(id, rankingPunctuation);
+                var rankingPunctuation = await _rankingPunctuationService.UpdateAsync(id, new RankingPunctuation(model.Position, model.Punctuation));
+                if (rankingPunctuation == null) return Response();
+                var rankingPunctuationDTO = RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation);
 
-                return Response(result);
+                return Response(rankingPunctuationDTO);
             }
 
             NotifyModelStateError();
@@ -122,13 +119,8 @@ namespace PokerSNTS.API.Controllers
         [HttpGet("Punctuation")]
         public async Task<IActionResult> GetPunctuationAsync()
         {
-            var rankingPunctuationsDTO = new List<RankingPunctuationDTO>();
             var rankingPunctuations = await _rankingPunctuationService.GetAllAsync();
-            foreach (var rankingPunctuation in rankingPunctuations)
-            {
-                rankingPunctuationsDTO.Add(RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation));
-                                           
-            }
+            var rankingPunctuationsDTO = rankingPunctuations.Select(x => RankingPunctuationAdapter.ToRankingPunctuationDTO(x)).ToList();
 
             return Response(rankingPunctuationsDTO);
         }

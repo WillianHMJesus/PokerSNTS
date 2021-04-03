@@ -9,56 +9,50 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class PlayerService : IPlayerService
+    public class PlayerService : BaseService, IPlayerService
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notification;
+        private readonly IDomainNotificationHandler _notifications;
 
-        public PlayerService(IPlayerRepository playerRepository, 
-            IUnitOfWork unitOfWork, 
-            IDomainNotificationHandler notification)
+        public PlayerService(IPlayerRepository playerRepository,
+            IUnitOfWork unitOfWork,
+            IDomainNotificationHandler notifications)
+            : base(notifications)
         {
             _playerRepository = playerRepository;
             _unitOfWork = unitOfWork;
-            _notification = notification;
+            _notifications = notifications;
         }
 
-        public async Task<bool> AddAsync(Player player)
+        public async Task<Player> AddAsync(Player player)
         {
-            var validationResult = player.Validate();
-            if (validationResult.IsValid)
+            if (ValidateEntity(player))
             {
                 _playerRepository.Add(player);
-
-                return await _unitOfWork.CommitAsync();
+                if (await _unitOfWork.CommitAsync()) return player;
             }
 
-            _notification.HandleNotification(validationResult);
-
-            return false;
+            return null;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, Player player)
+        public async Task<Player> UpdateAsync(Guid id, Player player)
         {
             var existingPlayer = await _playerRepository.GetByIdAsync(id);
-            if (existingPlayer == null) _notification.HandleNotification("DomainValidation", "Jogador não encontrado.");
-
-            if(!_notification.HasNotification())
+            if (existingPlayer == null)
             {
-                existingPlayer.Update(player.Name);
-                var validationResult = existingPlayer.Validate();
-                if (validationResult.IsValid)
-                {
-                    _playerRepository.Update(existingPlayer);
-
-                    return await _unitOfWork.CommitAsync();
-                }
-
-                _notification.HandleNotification(validationResult);
+                _notifications.HandleNotification("DomainValidation", "Jogador não encontrado.");
+                return null;
             }
 
-            return false;
+            existingPlayer.Update(player.Name);
+            if (ValidateEntity(existingPlayer))
+            {
+                _playerRepository.Update(existingPlayer);
+                if (await _unitOfWork.CommitAsync()) return existingPlayer;
+            }
+
+            return null;
         }
 
         public async Task<IEnumerable<Player>> GetAllAsync()

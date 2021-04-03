@@ -7,8 +7,8 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IRankingService
     {
-        Task<bool> AddAsync(Ranking ranking);
-        Task<bool> UpdateAsync(Guid id, Ranking ranking);
+        Task<Ranking> AddAsync(Ranking ranking);
+        Task<Ranking> UpdateAsync(Guid id, Ranking ranking);
         Task<IEnumerable<Ranking>> GetAllAsync();
     }
 }

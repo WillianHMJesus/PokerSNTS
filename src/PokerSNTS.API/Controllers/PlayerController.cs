@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
 using PokerSNTS.Domain.Adapters;
-using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Notifications;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.API.Controllers
@@ -15,7 +14,7 @@ namespace PokerSNTS.API.Controllers
     {
         private readonly IPlayerService _playerService;
 
-        public PlayerController(IPlayerService playerService, 
+        public PlayerController(IPlayerService playerService,
             IDomainNotificationHandler notifications)
             : base(notifications)
         {
@@ -27,10 +26,11 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var player = new Player(model.Name);
-                var result = await _playerService.AddAsync(player);
+                var player = await _playerService.AddAsync(new Player(model.Name));
+                if (player == null) return Response();
+                var playerDTO = PlayerAdapter.ToPlayerDTO(player);
 
-                return Response(result);
+                return Response(playerDTO);
             }
 
             NotifyModelStateError();
@@ -44,16 +44,16 @@ namespace PokerSNTS.API.Controllers
             if (id.Equals(default(Guid)))
             {
                 AddError("O Id do jogador não foi informado.");
-
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var player = new Player(model.Name);
-                var result = await _playerService.UpdateAsync(id, player);
+                var player = await _playerService.UpdateAsync(id, new Player(model.Name));
+                if (player == null) return Response();
+                var playerDTO = PlayerAdapter.ToPlayerDTO(player);
 
-                return Response(result);
+                return Response(playerDTO);
             }
 
             NotifyModelStateError();
@@ -64,14 +64,10 @@ namespace PokerSNTS.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var playersDTO = new List<PlayerDTO>();
             var players = await _playerService.GetAllAsync();
-            foreach (var player in players)
-            {
-                playersDTO.Add(PlayerAdapter.ToPlayerDTO(player));
-            }
+            var playersDTO = players.Select(x => PlayerAdapter.ToPlayerDTO(x)).ToList();
 
-            return Response();
+            return Response(playersDTO);
         }
     }
 }

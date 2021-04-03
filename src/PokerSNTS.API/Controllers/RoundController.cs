@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
 using PokerSNTS.Domain.Adapters;
-using PokerSNTS.Domain.DTOs;
 using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Notifications;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.API.Controllers
@@ -30,10 +29,11 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var round = new Round(model.Description, model.Date, model.RankingId);
-                var result = await _roundService.AddAsync(round);
+                var round = await _roundService.AddAsync(new Round(model.Description, model.Date, model.RankingId));
+                if (round == null) return Response();
+                var roundDTO = RoundAdapter.ToRoundDTO(round);
 
-                return Response(result);
+                return Response(roundDTO);
             }
 
             NotifyModelStateError();
@@ -47,16 +47,16 @@ namespace PokerSNTS.API.Controllers
             if (id.Equals(default(Guid)))
             {
                 AddError("O Id da rodada não foi informado.");
-
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var round = new Round(model.Description, model.Date, model.RankingId);
-                var result = await _roundService.UpdateAsync(id, round);
+                var round = await _roundService.UpdateAsync(id, new Round(model.Description, model.Date, model.RankingId));
+                if (round == null) return Response();
+                var roundDTO = RoundAdapter.ToRoundDTO(round);
 
-                return Response(result);
+                return Response(roundDTO);
             }
 
             NotifyModelStateError();
@@ -67,12 +67,8 @@ namespace PokerSNTS.API.Controllers
         [HttpGet("{rankingId}")]
         public async Task<IActionResult> GetAsync(Guid rankingId)
         {
-            var roundsDTO = new List<RoundDTO>();
             var rounds = await _roundService.GetRoundByRankingIdAsync(rankingId);
-            foreach (var round in rounds)
-            {
-                RoundAdapter.ToRoundDTO(round);
-            }
+            var roundsDTO = rounds.Select(x => RoundAdapter.ToRoundDTO(x)).ToList();
 
             return Response(roundsDTO);
         }
@@ -82,10 +78,12 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
-                var result = await _roundPunctuationService.AddAsync(roundPunctuation);
+                var roundPunctuation = await _roundPunctuationService.AddAsync(
+                    new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId));
+                if (roundPunctuation == null) return Response();
+                var roundPunctuationDTO = RoundPunctuationAdapter.ToRoundPunctuationDTO(roundPunctuation);
 
-                return Response(result);
+                return Response(roundPunctuationDTO);
             }
 
             NotifyModelStateError();
@@ -99,16 +97,17 @@ namespace PokerSNTS.API.Controllers
             if (id.Equals(default(Guid)))
             {
                 AddError("O Id da pontuação da rodada não foi informado.");
-
                 return Response();
             }
 
             if (ModelState.IsValid)
             {
-                var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
-                var result = await _roundPunctuationService.UpdateAsync(id, roundPunctuation);
+                var roundPunctuation = await _roundPunctuationService.UpdateAsync(id,
+                    new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId));
+                if (roundPunctuation == null) return Response();
+                var roundPunctuationDTO = RoundPunctuationAdapter.ToRoundPunctuationDTO(roundPunctuation);
 
-                return Response(result);
+                return Response(roundPunctuationDTO);
             }
 
             NotifyModelStateError();

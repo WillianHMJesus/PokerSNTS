@@ -9,56 +9,50 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class RankingPunctuationService : IRankingPunctuationService
+    public class RankingPunctuationService : BaseService, IRankingPunctuationService
     {
         private readonly IRankingPunctuationRepository _rankingPunctuationRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notification;
+        private readonly IDomainNotificationHandler _notifications;
 
         public RankingPunctuationService(IRankingPunctuationRepository rankingPunctuationRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notification)
+            IDomainNotificationHandler notifications)
+            : base(notifications)
         {
             _rankingPunctuationRepository = rankingPunctuationRepository;
             _unitOfWork = unitOfWork;
-            _notification = notification;
+            _notifications = notifications;
         }
 
-        public async Task<bool> AddAsync(RankingPunctuation rankingPunctuation)
+        public async Task<RankingPunctuation> AddAsync(RankingPunctuation rankingPunctuation)
         {
-            var validationResult = rankingPunctuation.Validate();
-            if (validationResult.IsValid)
+            if(ValidateEntity(rankingPunctuation))
             {
                 _rankingPunctuationRepository.Add(rankingPunctuation);
-
-                return await _unitOfWork.CommitAsync();
+                if (await _unitOfWork.CommitAsync()) return rankingPunctuation;
             }
 
-            _notification.HandleNotification(validationResult);
-
-            return false;
+            return null;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
+        public async Task<RankingPunctuation> UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
         {
             var existingRankingPunctuation = await _rankingPunctuationRepository.GetByIdAsync(id);
-            if (existingRankingPunctuation == null) _notification.HandleNotification("DomainValidation", "Pontuação do ranking não foi encontrada.");
-
-            if(!_notification.HasNotification())
+            if (existingRankingPunctuation == null)
             {
-                existingRankingPunctuation.Update(rankingPunctuation.Position, rankingPunctuation.Punctuation);
-                var validationResult = existingRankingPunctuation.Validate();
-                if (validationResult.IsValid)
-                {
-                    _rankingPunctuationRepository.Update(existingRankingPunctuation);
-
-                    return await _unitOfWork.CommitAsync();
-                }
-
-                _notification.HandleNotification(validationResult);
+                _notifications.HandleNotification("DomainValidation", "Pontuação do ranking não foi encontrada.");
+                return null;
             }
 
-            return false;
+            existingRankingPunctuation.Update(rankingPunctuation.Position, rankingPunctuation.Punctuation);
+            if(ValidateEntity(existingRankingPunctuation))
+            {
+                _rankingPunctuationRepository.Update(existingRankingPunctuation);
+                if (await _unitOfWork.CommitAsync()) return existingRankingPunctuation;
+            }
+
+            return null;
         }
 
         public async Task<IEnumerable<RankingPunctuation>> GetAllAsync()

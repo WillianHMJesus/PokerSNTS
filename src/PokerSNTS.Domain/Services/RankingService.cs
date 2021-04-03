@@ -9,56 +9,50 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class RankingService : IRankingService
+    public class RankingService : BaseService, IRankingService
     {
         private readonly IRankingRepository _rankingRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notification;
+        private readonly IDomainNotificationHandler _notifications;
 
         public RankingService(IRankingRepository rankingRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notification)
+            IDomainNotificationHandler notifications)
+            : base(notifications)
         {
             _rankingRepository = rankingRepository;
             _unitOfWork = unitOfWork;
-            _notification = notification;
+            _notifications = notifications;
         }
 
-        public async Task<bool> AddAsync(Ranking ranking)
+        public async Task<Ranking> AddAsync(Ranking ranking)
         {
-            var validationResult = ranking.Validate();
-            if (validationResult.IsValid)
+            if (ValidateEntity(ranking))
             {
                 _rankingRepository.Add(ranking);
-
-                return await _unitOfWork.CommitAsync();
+                if (await _unitOfWork.CommitAsync()) return ranking;
             }
 
-            _notification.HandleNotification(validationResult);
-
-            return false;
+            return null;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, Ranking ranking)
+        public async Task<Ranking> UpdateAsync(Guid id, Ranking ranking)
         {
             var existingRanking = await _rankingRepository.GetByIdAsync(id);
-            if (existingRanking == null) _notification.HandleNotification("DomainValidation", "Ranking não encontrado.");
-
-            if (!_notification.HasNotification())
+            if (existingRanking == null)
             {
-                existingRanking.Update(ranking.Description, ranking.AwardValue);
-                var validationResult = existingRanking.Validate();
-                if (validationResult.IsValid)
-                {
-                    _rankingRepository.Update(existingRanking);
-
-                    return await _unitOfWork.CommitAsync();
-                }
-
-                _notification.HandleNotification(validationResult);
+                _notifications.HandleNotification("DomainValidation", "Ranking não encontrado.");
+                return null;
             }
 
-            return false;
+            existingRanking.Update(ranking.Description, ranking.AwardValue);
+            if (ValidateEntity(existingRanking))
+            {
+                _rankingRepository.Update(existingRanking);
+                if (await _unitOfWork.CommitAsync()) return existingRanking;
+            }
+
+            return null;
         }
 
         public async Task<IEnumerable<Ranking>> GetAllAsync()

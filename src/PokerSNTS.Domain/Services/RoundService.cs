@@ -9,65 +9,52 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class RoundService : IRoundService
+    public class RoundService : BaseService, IRoundService
     {
         private readonly IRoundRepository _roundRepository;
         private readonly IRankingRepository _rankingRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notification;
+        private readonly IDomainNotificationHandler _notifications;
 
         public RoundService(IRoundRepository roundRepository,
             IRankingRepository rankingRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notification)
+            IDomainNotificationHandler notifications)
+            : base(notifications)
         {
             _roundRepository = roundRepository;
             _rankingRepository = rankingRepository;
             _unitOfWork = unitOfWork;
-            _notification = notification;
+            _notifications = notifications;
         }
 
-        public async Task<bool> AddAsync(Round round)
+        public async Task<Round> AddAsync(Round round)
         {
-            var validationResult = round.Validate();
-            if(validationResult.IsValid)
+            if (await ValidateRoundAsync(round))
             {
-                if(await ValidateRankingExistsAsync(round.RankingId))
-                {
-                    _roundRepository.Add(round);
-
-                    return await _unitOfWork.CommitAsync();
-                }
+                _roundRepository.Add(round);
+                if (await _unitOfWork.CommitAsync()) return round;
             }
 
-            _notification.HandleNotification(validationResult);
-
-            return false;
+            return null;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, Round round)
+        public async Task<Round> UpdateAsync(Guid id, Round round)
         {
             var existingRound = await _roundRepository.GetByIdAsync(id);
-            if (existingRound == null) _notification.HandleNotification("DomainValidation", "Rodada não encontrada.");
-
-            if(!_notification.HasNotification())
+            if (existingRound == null)
             {
-                existingRound.Update(round.Description, round.Date, round.RankingId);
-                var validationResult = existingRound.Validate();
-                if (validationResult.IsValid)
-                {
-                    if (await ValidateRankingExistsAsync(round.RankingId))
-                    {
-                        _roundRepository.Update(existingRound);
-
-                        return await _unitOfWork.CommitAsync();
-                    }
-                }
-
-                _notification.HandleNotification(validationResult);
+                _notifications.HandleNotification("DomainValidation", "Rodada não encontrada.");
             }
 
-            return false;
+            existingRound.Update(round.Description, round.Date, round.RankingId);
+            if (await ValidateRoundAsync(existingRound))
+            {
+                _roundRepository.Update(existingRound);
+                if (await _unitOfWork.CommitAsync()) return round;
+            }
+
+            return null;
         }
 
         public async Task<IEnumerable<Round>> GetRoundByRankingIdAsync(Guid rankingId)
@@ -75,17 +62,22 @@ namespace PokerSNTS.Domain.Services
             return await _roundRepository.GetRoundByRankingIdAsync(rankingId);
         }
 
+        private async Task<bool> ValidateRoundAsync(Round round)
+        {
+            var validateEntity = ValidateEntity(round);
+            var validateRanking = await ValidateRankingExistsAsync(round.RankingId);
+
+            return validateEntity && validateRanking;
+        }
+
         private async Task<bool> ValidateRankingExistsAsync(Guid rankingId)
         {
             var ranking = await _rankingRepository.GetByIdAsync(rankingId);
-            if (ranking == null)
-            {
-                _notification.HandleNotification("DomainValidation", "Ranking não encontrado.");
+            if (ranking != null) return true;
 
-                return false;
-            }
+            _notifications.HandleNotification("DomainValidation", "Ranking não encontrado.");
 
-            return true;
+            return false;
         }
     }
 }

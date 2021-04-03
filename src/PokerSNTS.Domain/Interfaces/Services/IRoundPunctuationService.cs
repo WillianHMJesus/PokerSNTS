@@ -6,7 +6,7 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IRoundPunctuationService
     {
-        Task<bool> AddAsync(RoundPunctuation roundPunctuation);
-        Task<bool> UpdateAsync(Guid id, RoundPunctuation roundPunctuation);
+        Task<RoundPunctuation> AddAsync(RoundPunctuation roundPunctuation);
+        Task<RoundPunctuation> UpdateAsync(Guid id, RoundPunctuation roundPunctuation);
     }
 }

@@ -9,56 +9,50 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class RegulationService : IRegulationService
+    public class RegulationService : BaseService, IRegulationService
     {
         private readonly IRegulationRepository _regulationRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notification;
+        private readonly IDomainNotificationHandler _notifications;
 
         public RegulationService(IRegulationRepository regulationRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notification)
+            IDomainNotificationHandler notifications)
+            : base(notifications)
         {
             _regulationRepository = regulationRepository;
             _unitOfWork = unitOfWork;
-            _notification = notification;
+            _notifications = notifications;
         }
 
-        public async Task<bool> AddAsync(Regulation regulation)
+        public async Task<Regulation> AddAsync(Regulation regulation)
         {
-            var validationResult = regulation.Validate();
-            if(validationResult.IsValid)
+            if(ValidateEntity(regulation))
             {
                 _regulationRepository.Add(regulation);
-
-                return await _unitOfWork.CommitAsync();
+                if (await _unitOfWork.CommitAsync()) return regulation;
             }
 
-            _notification.HandleNotification(validationResult);
-
-            return false;
+            return null;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, Regulation regulation)
+        public async Task<Regulation> UpdateAsync(Guid id, Regulation regulation)
         {
             var existingRegulation = await _regulationRepository.GetByIdAsync(id);
-            if (existingRegulation == null) _notification.HandleNotification("DomainValidation", "Regulamento não encontrado");
-
-            if(!_notification.HasNotification())
+            if (existingRegulation == null)
             {
-                existingRegulation.Update(regulation.Description);
-                var validationResult = existingRegulation.Validate();
-                if (validationResult.IsValid)
-                {
-                    _regulationRepository.Update(existingRegulation);
-
-                    return await _unitOfWork.CommitAsync();
-                }
-
-                _notification.HandleNotification(validationResult);
+                _notifications.HandleNotification("DomainValidation", "Regulamento não encontrado");
+                return null;
             }
 
-            return false;
+            existingRegulation.Update(regulation.Description);
+            if(ValidateEntity(existingRegulation))
+            {
+                _regulationRepository.Update(existingRegulation);
+                if (await _unitOfWork.CommitAsync()) return existingRegulation;
+            }
+
+            return null;
         }
 
         public async Task<IEnumerable<Regulation>> GetAllAsync()

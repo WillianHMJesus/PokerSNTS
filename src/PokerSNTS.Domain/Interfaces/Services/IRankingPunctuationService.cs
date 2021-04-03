@@ -7,8 +7,8 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IRankingPunctuationService
     {
-        Task<bool> AddAsync(RankingPunctuation rankingPunctuation);
-        Task<bool> UpdateAsync(Guid id, RankingPunctuation rankingPunctuation);
+        Task<RankingPunctuation> AddAsync(RankingPunctuation rankingPunctuation);
+        Task<RankingPunctuation> UpdateAsync(Guid id, RankingPunctuation rankingPunctuation);
         Task<IEnumerable<RankingPunctuation>> GetAllAsync();
         Task<RankingPunctuation> GetRankingPunctuationByPositionAsync(short position);
     }
