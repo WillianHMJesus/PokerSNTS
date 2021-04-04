@@ -73,6 +73,18 @@ namespace PokerSNTS.API.Controllers
 
             return Response(rankingDTO);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOverrallByIdAsync(Guid id)
+        {
+            return Response(await _rankingService.GetOverallById(id));
+        }
+
+        [HttpGet("{initialDate}/{finalDate}")]
+        public async Task<IActionResult> GetOverrallByPeriodAsync(DateTime initialDate, DateTime finalDate)
+        {
+            return Response(await _rankingService.GetOverallByPeriod(initialDate, finalDate));
+        }
         #endregion
 
         #region Punctuation
