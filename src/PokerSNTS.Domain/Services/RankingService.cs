@@ -13,52 +13,47 @@ namespace PokerSNTS.Domain.Services
     public class RankingService : BaseService, IRankingService
     {
         private readonly IRankingRepository _rankingRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notifications;
 
         public RankingService(IRankingRepository rankingRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notifications)
-            : base(notifications)
+            INotificationHandler notifications)
+            : base(unitOfWork, notifications)
         {
             _rankingRepository = rankingRepository;
-            _unitOfWork = unitOfWork;
-            _notifications = notifications;
         }
 
-        public async Task<Ranking> AddAsync(Ranking ranking)
+        public async Task AddAsync(Ranking ranking)
         {
             if (ValidateEntity(ranking))
             {
                 _rankingRepository.Add(ranking);
-                if (await _unitOfWork.CommitAsync()) return ranking;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar o ranking.");
+            }
         }
 
-        public async Task<Ranking> UpdateAsync(Guid id, Ranking ranking)
+        public async Task UpdateAsync(Guid id, Ranking ranking)
         {
             var existingRanking = await _rankingRepository.GetByIdAsync(id);
-            if (existingRanking == null)
-            {
-                _notifications.HandleNotification("DomainValidation", "Ranking não encontrado.");
-                return null;
-            }
+            if (existingRanking == null) AddNotification("Ranking não encontrado.");
 
             existingRanking.Update(ranking.Description, ranking.AwardValue);
             if (ValidateEntity(existingRanking))
             {
                 _rankingRepository.Update(existingRanking);
-                if (await _unitOfWork.CommitAsync()) return existingRanking;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar o ranking.");
+            }
         }
 
         public async Task<IEnumerable<Ranking>> GetAllAsync()
         {
             return await _rankingRepository.GetAllAsync();
+        }
+
+        public async Task<Ranking> GetByIdAsync(Guid id)
+        {
+            return await _rankingRepository.GetByIdAsync(id);
         }
 
         public async Task<IEnumerable<RankingOverallDTO>> GetOverallById(Guid id)

@@ -4,26 +4,26 @@ using System.Linq;
 
 namespace PokerSNTS.Domain.Notifications
 {
-    public class DomainNotificationHandler : IDomainNotificationHandler
+    public class NotificationHandler : INotificationHandler
     {
-        private List<DomainNotification> _notifications;
+        private List<Notification> _notifications;
 
-        public DomainNotificationHandler()
+        public NotificationHandler()
         {
-            _notifications = new List<DomainNotification>();
+            _notifications = new List<Notification>();
         }
 
         public void HandleNotification(ValidationResult validationResult)
         {
             foreach (var error in validationResult?.Errors ?? Enumerable.Empty<ValidationFailure>())
             {
-                _notifications.Add(new DomainNotification("DomainValidation", error.ErrorMessage));
+                _notifications.Add(new Notification("DomainValidation", error.ErrorMessage));
             }
         }
 
         public void HandleNotification(string key, string value)
         {
-            _notifications.Add(new DomainNotification(key, value));
+            _notifications.Add(new Notification(key, value));
         }
 
         public bool HasNotification()
@@ -31,14 +31,14 @@ namespace PokerSNTS.Domain.Notifications
             return _notifications.Any();
         }
 
-        public List<DomainNotification> GetNotifications()
+        public List<Notification> GetNotifications()
         {
             return _notifications;
         }
 
         public void Dispose()
         {
-            _notifications = new List<DomainNotification>();
+            _notifications = new List<Notification>();
         }
     }
 }

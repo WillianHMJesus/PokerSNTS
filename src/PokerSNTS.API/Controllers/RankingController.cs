@@ -18,7 +18,7 @@ namespace PokerSNTS.API.Controllers
 
         public RankingController(IRankingService rankingService,
             IRankingPunctuationService rankingPunctuationService,
-            IDomainNotificationHandler notification) : base(notification)
+            INotificationHandler notification) : base(notification)
         {
             _rankingService = rankingService;
             _rankingPunctuationService = rankingPunctuationService;
@@ -30,121 +30,164 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var ranking = await _rankingService.AddAsync(new Ranking(model.Description, model.AwardValue));
-                if (ranking == null) return Response();
-                var rankingDTO = RankingAdapter.ToRankingDTO(ranking);
+                var ranking = new Ranking(model.Description, model.AwardValue);
+                await _rankingService.AddAsync(ranking);
 
-                return Response(rankingDTO);
+                if (ValidOperation())
+                    return CreatedAtAction(nameof(GetByIdAsync), ranking.Id);
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] RankingInputModel model)
         {
-            if (id.Equals(default(Guid)))
+            if (default(Guid).Equals(id))
             {
-                AddError("O Id do ranking não foi informada.");
-                return Response();
+                AddNotification("O Id do ranking não foi informada.");
+                return ResponseInvalid();
             }
 
             if (ModelState.IsValid)
             {
-                var ranking = await _rankingService.UpdateAsync(id, new Ranking(model.Description, model.AwardValue));
-                if (ranking == null) return Response();
-                var rankingDTO = RankingAdapter.ToRankingDTO(ranking);
+                var ranking = new Ranking(model.Description, model.AwardValue);
+                await _rankingService.UpdateAsync(id, ranking);
 
-                return Response(rankingDTO);
+                if (ValidOperation()) return NoContent();
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
             var ranking = await _rankingService.GetAllAsync();
-            var rankingDTO = ranking.Select(x => RankingAdapter.ToRankingDTO(x)).ToList();
 
-            return Response(rankingDTO);
+            if (ranking.Any())
+                return Ok(ranking.Select(x => RankingAdapter.ToRankingDTO(x)));
+
+            return NoContent();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
+        {
+            var ranking = await _rankingService.GetByIdAsync(id);
+
+            if (ranking != null)
+                return Ok(RankingAdapter.ToRankingDTO(ranking));
+
+            return NoContent();
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOverrallByIdAsync(Guid id)
         {
-            return Response(await _rankingService.GetOverallById(id));
+            var ranking = await _rankingService.GetOverallById(id);
+
+            if (ranking.Any())
+                return Ok(ranking);
+
+            return NoContent();
         }
 
         [HttpGet("{initialDate}/{finalDate}")]
         public async Task<IActionResult> GetOverrallByPeriodAsync(DateTime initialDate, DateTime finalDate)
         {
-            return Response(await _rankingService.GetOverallByPeriod(initialDate, finalDate));
+            var ranking = await _rankingService.GetOverallByPeriod(initialDate, finalDate);
+
+            if (ranking.Any())
+                return Ok(ranking);
+
+            return NoContent();
         }
         #endregion
 
-        #region Punctuation
+        #region Ranking Punctuation
         [HttpPost("Punctuation")]
         public async Task<IActionResult> PostAsync([FromBody] RankingPunctuationInputModel model)
         {
             if (ModelState.IsValid)
             {
-                var rankingPunctuation = await _rankingPunctuationService.AddAsync(new RankingPunctuation(model.Position, model.Punctuation));
-                if (rankingPunctuation == null) return Response();
-                var rankingPunctuationDTO = RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation);
+                var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
+                await _rankingPunctuationService.AddAsync(rankingPunctuation);
 
-                return Response(rankingPunctuationDTO);
+                if (ValidOperation())
+                    return CreatedAtAction(nameof(GetPunctuationByIdAsync), rankingPunctuation.Id);
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpPut("Punctuation/{id}")]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] RankingPunctuationInputModel model)
         {
-            if (id.Equals(default(Guid)))
+            if (default(Guid).Equals(id))
             {
-                AddError("O Id da pontuação do ranking não foi informada.");
-                return Response();
+                AddNotification("O Id da pontuação do ranking não foi informada.");
+                return ResponseInvalid();
             }
 
             if (ModelState.IsValid)
             {
-                var rankingPunctuation = await _rankingPunctuationService.UpdateAsync(id, new RankingPunctuation(model.Position, model.Punctuation));
-                if (rankingPunctuation == null) return Response();
-                var rankingPunctuationDTO = RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation);
+                var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
+                await _rankingPunctuationService.UpdateAsync(id, rankingPunctuation);
 
-                return Response(rankingPunctuationDTO);
+                if (ValidOperation()) return NoContent();
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpGet("Punctuation")]
         public async Task<IActionResult> GetPunctuationAsync()
         {
             var rankingPunctuations = await _rankingPunctuationService.GetAllAsync();
-            var rankingPunctuationsDTO = rankingPunctuations.Select(x => RankingPunctuationAdapter.ToRankingPunctuationDTO(x)).ToList();
 
-            return Response(rankingPunctuationsDTO);
+            if (rankingPunctuations.Any())
+                return Ok(rankingPunctuations.Select(x => RankingPunctuationAdapter.ToRankingPunctuationDTO(x)));
+
+            return NoContent();
+        }
+
+        [HttpGet("Punctuation/{id}")]
+        public async Task<IActionResult> GetPunctuationByIdAsync(Guid id)
+        {
+            var rankingPunctuation = await _rankingPunctuationService.GetByIdAsync(id);
+
+            if (rankingPunctuation != null)
+                return Ok(RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation));
+
+            return NoContent();
         }
 
         [HttpGet("Punctuation/{position}")]
         public async Task<IActionResult> GetPunctuationByPositionAsync(short position)
         {
-            var rankingPunctuation = await _rankingPunctuationService.GetRankingPunctuationByPositionAsync(position);
-            if (rankingPunctuation == null) return Response();
-            var rankingPunctuationDTO = RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation);
+            var rankingPunctuation = await _rankingPunctuationService.GetByPositionAsync(position);
 
-            return Response(rankingPunctuationDTO);
+            if (rankingPunctuation != null)
+                return Ok(RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation));
+
+            return NoContent();
         }
         #endregion
     }

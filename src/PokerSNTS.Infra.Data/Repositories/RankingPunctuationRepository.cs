@@ -27,17 +27,17 @@ namespace PokerSNTS.Infra.Data.Repositories
             _context.RankingPunctuations.Update(rankingPunctuation);
         }
 
+        public async Task<IEnumerable<RankingPunctuation>> GetAllAsync()
+        {
+            return await _context.RankingPunctuations.AsNoTracking().ToListAsync();
+        }
+
         public async Task<RankingPunctuation> GetByIdAsync(Guid id)
         {
             return await _context.RankingPunctuations.FindAsync(id);
         }
 
-        public async Task<IEnumerable<RankingPunctuation>> GetAllAsync()
-        {
-            return await _context.RankingPunctuations.ToListAsync();
-        }
-
-        public async Task<RankingPunctuation> GetRankingPunctuationByPositionAsync(short position)
+        public async Task<RankingPunctuation> GetByPositionAsync(short position)
         {
             return await _context.RankingPunctuations.AsNoTracking().FirstOrDefaultAsync(x => x.Position == position);
         }

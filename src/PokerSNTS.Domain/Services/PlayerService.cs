@@ -12,52 +12,47 @@ namespace PokerSNTS.Domain.Services
     public class PlayerService : BaseService, IPlayerService
     {
         private readonly IPlayerRepository _playerRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notifications;
 
         public PlayerService(IPlayerRepository playerRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notifications)
-            : base(notifications)
+            INotificationHandler notifications)
+            : base(unitOfWork, notifications)
         {
             _playerRepository = playerRepository;
-            _unitOfWork = unitOfWork;
-            _notifications = notifications;
         }
 
-        public async Task<Player> AddAsync(Player player)
+        public async Task AddAsync(Player player)
         {
             if (ValidateEntity(player))
             {
                 _playerRepository.Add(player);
-                if (await _unitOfWork.CommitAsync()) return player;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar o jogador.");
+            }
         }
 
-        public async Task<Player> UpdateAsync(Guid id, Player player)
+        public async Task UpdateAsync(Guid id, Player player)
         {
             var existingPlayer = await _playerRepository.GetByIdAsync(id);
-            if (existingPlayer == null)
-            {
-                _notifications.HandleNotification("DomainValidation", "Jogador não encontrado.");
-                return null;
-            }
+            if (existingPlayer == null) AddNotification("Jogador não encontrado.");
 
             existingPlayer.Update(player.Name);
             if (ValidateEntity(existingPlayer))
             {
                 _playerRepository.Update(existingPlayer);
-                if (await _unitOfWork.CommitAsync()) return existingPlayer;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível atualizar o jogador.");
+            }
         }
 
         public async Task<IEnumerable<Player>> GetAllAsync()
         {
             return await _playerRepository.GetAllAsync();
+        }
+
+        public async Task<Player> GetByIdAsync(Guid id)
+        {
+            return await _playerRepository.GetByIdAsync(id);
         }
     }
 }

@@ -7,8 +7,9 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IPlayerService
     {
-        Task<Player> AddAsync(Player player);
-        Task<Player> UpdateAsync(Guid id, Player player);
+        Task AddAsync(Player player);
+        Task UpdateAsync(Guid id, Player player);
         Task<IEnumerable<Player>> GetAllAsync();
+        Task<Player> GetByIdAsync(Guid id);
     }
 }

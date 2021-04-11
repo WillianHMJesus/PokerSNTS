@@ -13,55 +13,57 @@ namespace PokerSNTS.Domain.Services
     {
         private readonly IRoundRepository _roundRepository;
         private readonly IRankingRepository _rankingRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notifications;
 
         public RoundService(IRoundRepository roundRepository,
             IRankingRepository rankingRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notifications)
-            : base(notifications)
+            INotificationHandler notifications)
+            : base(unitOfWork, notifications)
         {
             _roundRepository = roundRepository;
             _rankingRepository = rankingRepository;
-            _unitOfWork = unitOfWork;
-            _notifications = notifications;
         }
 
-        public async Task<Round> AddAsync(Round round)
+        public async Task AddAsync(Round round)
         {
             if (await ValidateRoundAsync(round))
             {
                 _roundRepository.Add(round);
-                if (await _unitOfWork.CommitAsync()) return round;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar a rodada.");
+            }
         }
 
-        public async Task<Round> UpdateAsync(Guid id, Round round)
+        public async Task UpdateAsync(Guid id, Round round)
         {
             var existingRound = await _roundRepository.GetByIdAsync(id);
-            if (existingRound == null)
-            {
-                _notifications.HandleNotification("DomainValidation", "Rodada não encontrada.");
-            }
+            if (existingRound == null) AddNotification("Rodada não encontrada.");
 
             existingRound.Update(round.Description, round.Date, round.RankingId);
             if (await ValidateRoundAsync(existingRound))
             {
                 _roundRepository.Update(existingRound);
-                if (await _unitOfWork.CommitAsync()) return round;
+
+                if (!await CommitAsync()) AddNotification("Não foi possível atualizar a rodada.");
             }
-
-            return null;
         }
 
-        public async Task<IEnumerable<Round>> GetRoundByRankingIdAsync(Guid rankingId)
+        public async Task<IEnumerable<Round>> GetAllAsync()
         {
-            return await _roundRepository.GetRoundByRankingIdAsync(rankingId);
+            return await _roundRepository.GetAllAsync();
         }
 
+        public async Task<Round> GetByIdAsync(Guid id)
+        {
+            return await _roundRepository.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<Round>> GetByRankingIdAsync(Guid rankingId)
+        {
+            return await _roundRepository.GetByRankingIdAsync(rankingId);
+        }
+
+        #region Validate
         private async Task<bool> ValidateRoundAsync(Round round)
         {
             var validateEntity = ValidateEntity(round);
@@ -75,9 +77,10 @@ namespace PokerSNTS.Domain.Services
             var ranking = await _rankingRepository.GetByIdAsync(rankingId);
             if (ranking != null) return true;
 
-            _notifications.HandleNotification("DomainValidation", "Ranking não encontrado.");
+            AddNotification("Ranking não encontrado.");
 
             return false;
         }
+        #endregion
     }
 }

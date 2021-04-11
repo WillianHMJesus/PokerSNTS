@@ -17,102 +17,134 @@ namespace PokerSNTS.API.Controllers
 
         public RoundController(IRoundService roundService,
             IRoundPunctuationService roundPunctuationService,
-            IDomainNotificationHandler notifications)
+            INotificationHandler notifications)
             : base(notifications)
         {
             _roundService = roundService;
             _roundPunctuationService = roundPunctuationService;
         }
 
+        #region Round
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] RoundInputModel model)
         {
             if (ModelState.IsValid)
             {
-                var round = await _roundService.AddAsync(new Round(model.Description, model.Date, model.RankingId));
-                if (round == null) return Response();
-                var roundDTO = RoundAdapter.ToRoundDTO(round);
+                var round = new Round(model.Description, model.Date, model.RankingId);
+                await _roundService.AddAsync(round);
 
-                return Response(roundDTO);
+                if (ValidOperation())
+                    return CreatedAtAction(nameof(GetByIdAsync), round.Id);
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] RoundInputModel model)
         {
-            if (id.Equals(default(Guid)))
+            if (default(Guid).Equals(id))
             {
-                AddError("O Id da rodada não foi informado.");
-                return Response();
+                AddNotification("O Id da rodada não foi informado.");
+                return ResponseInvalid();
             }
 
             if (ModelState.IsValid)
             {
-                var round = await _roundService.UpdateAsync(id, new Round(model.Description, model.Date, model.RankingId));
-                if (round == null) return Response();
-                var roundDTO = RoundAdapter.ToRoundDTO(round);
+                var round = new Round(model.Description, model.Date, model.RankingId);
+                await _roundService.UpdateAsync(id, round);
 
-                return Response(roundDTO);
+                if (ValidOperation()) return NoContent();
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
+        {
+            var round = await _roundService.GetByIdAsync(id);
+
+            if (round != null)
+                return Ok(RoundAdapter.ToRoundDTO(round));
+
+            return NoContent();
         }
 
         [HttpGet("{rankingId}")]
-        public async Task<IActionResult> GetAsync(Guid rankingId)
+        public async Task<IActionResult> GetByRankingIdAsync(Guid rankingId)
         {
-            var rounds = await _roundService.GetRoundByRankingIdAsync(rankingId);
-            var roundsDTO = rounds.Select(x => RoundAdapter.ToRoundDTO(x)).ToList();
+            var rounds = await _roundService.GetByRankingIdAsync(rankingId);
 
-            return Response(roundsDTO);
+            if (rounds.Any())
+                return Ok(rounds.Select(x => RoundAdapter.ToRoundDTO(x)));
+
+            return NoContent();
         }
+        #endregion
 
+        #region Round Punctuation
         [HttpPost("Punctuation")]
         public async Task<IActionResult> PostPunctuationAsync([FromBody] RoundPunctuationInputModel model)
         {
             if (ModelState.IsValid)
             {
-                var roundPunctuation = await _roundPunctuationService.AddAsync(
-                    new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId));
-                if (roundPunctuation == null) return Response();
-                var roundPunctuationDTO = RoundPunctuationAdapter.ToRoundPunctuationDTO(roundPunctuation);
+                var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
+                await _roundPunctuationService.AddAsync(roundPunctuation);
 
-                return Response(roundPunctuationDTO);
+                if (ValidOperation())
+                    return CreatedAtAction(nameof(GetPunctuationByIdAsync), roundPunctuation.Id);
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpPut("Punctuation/{id}")]
         public async Task<IActionResult> PutPunctuationAsync(Guid id, [FromBody] RoundPunctuationInputModel model)
         {
-            if (id.Equals(default(Guid)))
+            if (default(Guid).Equals(id))
             {
-                AddError("O Id da pontuação da rodada não foi informado.");
-                return Response();
+                AddNotification("O Id da pontuação da rodada não foi informado.");
+                return ResponseInvalid();
             }
 
             if (ModelState.IsValid)
             {
-                var roundPunctuation = await _roundPunctuationService.UpdateAsync(id,
-                    new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId));
-                if (roundPunctuation == null) return Response();
-                var roundPunctuationDTO = RoundPunctuationAdapter.ToRoundPunctuationDTO(roundPunctuation);
+                var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
+                await _roundPunctuationService.UpdateAsync(id, roundPunctuation);
 
-                return Response(roundPunctuationDTO);
+                if (ValidOperation()) return NoContent();
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
+
+        [HttpGet("Punctuation/{id}")]
+        public async Task<IActionResult> GetPunctuationByIdAsync(Guid id)
+        {
+            var roundPunctuation = await _roundPunctuationService.GetByIdAsync(id);
+
+            if (roundPunctuation != null)
+                return Ok(RoundPunctuationAdapter.ToRoundPunctuationDTO(roundPunctuation));
+
+            return NoContent();
+        }
+        #endregion
     }
 }

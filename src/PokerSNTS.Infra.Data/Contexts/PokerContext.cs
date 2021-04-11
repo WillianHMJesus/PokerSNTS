@@ -14,6 +14,7 @@ namespace PokerSNTS.Infra.Data.Contexts
         public DbSet<RankingPunctuation> RankingPunctuations { get; set; }
         public DbSet<Regulation> Regulations { get; set; }
         public DbSet<Round> Rounds { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -21,8 +21,10 @@ namespace PokerSNTS.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddControllers();
             services.ResolveDependencyInjection();
+            services.ConfigureToken();
 
             services.AddDbContext<PokerContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("PokerSNTS")));
@@ -51,6 +53,12 @@ namespace PokerSNTS.API
 
             app.UseRouting();
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

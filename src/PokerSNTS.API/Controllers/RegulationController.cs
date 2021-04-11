@@ -15,7 +15,7 @@ namespace PokerSNTS.API.Controllers
         private readonly IRegulationService _regulationService;
 
         public RegulationController(IRegulationService regulationService,
-            IDomainNotificationHandler notifications)
+            INotificationHandler notifications)
             : base(notifications)
         {
             _regulationService = regulationService;
@@ -26,48 +26,64 @@ namespace PokerSNTS.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                var regulation = await _regulationService.AddAsync(new Regulation(model.Description));
-                if (regulation == null) return Response();
-                var regulationDTO = RegulationAdapter.ToRegulationDTO(regulation);
+                var regulation = new Regulation(model.Description);
+                await _regulationService.AddAsync(regulation);
 
-                return Response(regulationDTO);
+                if (ValidOperation())
+                    return CreatedAtAction(nameof(GetByIdAsync), regulation.Id);
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] RegulationInputModel model)
         {
-            if (id.Equals(default(Guid)))
+            if (default(Guid).Equals(id))
             {
-                AddError("O Id do regulamento não foi informado.");
-                return Response();
+                AddNotification("O Id do regulamento não foi informado.");
+                return ResponseInvalid();
             }
 
             if (ModelState.IsValid)
             {
-                var regulation = await _regulationService.UpdateAsync(id, new Regulation(model.Description));
-                if (regulation == null) return Response();
-                var regulationDTO = RegulationAdapter.ToRegulationDTO(regulation);
+                var regulation = new Regulation(model.Description);
+                await _regulationService.UpdateAsync(id, regulation);
 
-                return Response(regulationDTO);
+                if (ValidOperation()) return NoContent();
+
+                return ResponseInvalid();
             }
 
             NotifyModelStateError();
 
-            return Response();
+            return ResponseInvalid();
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
             var regulations = await _regulationService.GetAllAsync();
-            var regulationsDTO = regulations.Select(x => RegulationAdapter.ToRegulationDTO(x)).ToList();
 
-            return Response(regulationsDTO);
+            if (regulations.Any())
+                return Ok(regulations.Select(x => RegulationAdapter.ToRegulationDTO(x)));
+
+            return NoContent();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
+        {
+            var regulation = await _regulationService.GetByIdAsync(id);
+
+            if (regulation != null)
+                return Ok(RegulationAdapter.ToRegulationDTO(regulation));
+
+            return NoContent();
         }
     }
 }

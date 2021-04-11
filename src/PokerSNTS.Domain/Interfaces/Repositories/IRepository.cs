@@ -1,5 +1,6 @@
 ﻿using PokerSNTS.Domain.Entities;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
@@ -8,6 +9,7 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
     {
         void Add(T entity);
         void Update(T entity);
+        Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIdAsync(Guid id);
     }
 }

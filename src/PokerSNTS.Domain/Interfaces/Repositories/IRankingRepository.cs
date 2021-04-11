@@ -8,7 +8,6 @@ namespace PokerSNTS.Domain.Interfaces.Repositories
 {
     public interface IRankingRepository : IRepository<Ranking>
     {
-        Task<IEnumerable<Ranking>> GetAllAsync();
         Task<IEnumerable<RankingOverallDTO>> GetOverallById(Guid id);
         Task<IEnumerable<RankingOverallDTO>> GetOverallByPeriod(DateTime initialDate, DateTime finalDate);
     }

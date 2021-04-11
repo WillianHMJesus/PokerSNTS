@@ -2,9 +2,9 @@
 
 namespace PokerSNTS.Domain.Notifications
 {
-    public class DomainNotification
+    public class Notification
     {
-        public DomainNotification(string key, string value)
+        public Notification(string key, string value)
         {
             Id = Guid.NewGuid();
             Key = key;

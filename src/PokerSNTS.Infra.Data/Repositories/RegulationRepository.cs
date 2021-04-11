@@ -27,14 +27,14 @@ namespace PokerSNTS.Infra.Data.Repositories
             _context.Regulations.Update(regulation);
         }
 
-        public async Task<Regulation> GetByIdAsync(Guid id)
-        {
-            return await _context.Regulations.FindAsync(id);
-        }
-
         public async Task<IEnumerable<Regulation>> GetAllAsync()
         {
             return await _context.Regulations.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<Regulation> GetByIdAsync(Guid id)
+        {
+            return await _context.Regulations.FindAsync(id);
         }
 
         public void Dispose()

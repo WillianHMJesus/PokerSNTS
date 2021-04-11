@@ -12,47 +12,37 @@ namespace PokerSNTS.Domain.Services
     public class RankingPunctuationService : BaseService, IRankingPunctuationService
     {
         private readonly IRankingPunctuationRepository _rankingPunctuationRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notifications;
 
         public RankingPunctuationService(IRankingPunctuationRepository rankingPunctuationRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notifications)
-            : base(notifications)
+            INotificationHandler notifications)
+            : base(unitOfWork, notifications)
         {
             _rankingPunctuationRepository = rankingPunctuationRepository;
-            _unitOfWork = unitOfWork;
-            _notifications = notifications;
         }
 
-        public async Task<RankingPunctuation> AddAsync(RankingPunctuation rankingPunctuation)
+        public async Task AddAsync(RankingPunctuation rankingPunctuation)
         {
-            if(ValidateEntity(rankingPunctuation))
+            if (ValidateEntity(rankingPunctuation))
             {
                 _rankingPunctuationRepository.Add(rankingPunctuation);
-                if (await _unitOfWork.CommitAsync()) return rankingPunctuation;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar a pontuação do ranking.");
+            }
         }
 
-        public async Task<RankingPunctuation> UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
+        public async Task UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
         {
             var existingRankingPunctuation = await _rankingPunctuationRepository.GetByIdAsync(id);
-            if (existingRankingPunctuation == null)
-            {
-                _notifications.HandleNotification("DomainValidation", "Pontuação do ranking não foi encontrada.");
-                return null;
-            }
+            if (existingRankingPunctuation == null) AddNotification("Pontuação do ranking não foi encontrada.");
 
             existingRankingPunctuation.Update(rankingPunctuation.Position, rankingPunctuation.Punctuation);
-            if(ValidateEntity(existingRankingPunctuation))
+            if (ValidateEntity(existingRankingPunctuation))
             {
                 _rankingPunctuationRepository.Update(existingRankingPunctuation);
-                if (await _unitOfWork.CommitAsync()) return existingRankingPunctuation;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível atualizar a pontuação do ranking");
+            }
         }
 
         public async Task<IEnumerable<RankingPunctuation>> GetAllAsync()
@@ -60,9 +50,14 @@ namespace PokerSNTS.Domain.Services
             return await _rankingPunctuationRepository.GetAllAsync();
         }
 
-        public async Task<RankingPunctuation> GetRankingPunctuationByPositionAsync(short position)
+        public async Task<RankingPunctuation> GetByIdAsync(Guid id)
         {
-            return await _rankingPunctuationRepository.GetRankingPunctuationByPositionAsync(position);
+            return await _rankingPunctuationRepository.GetByIdAsync(id);
+        }
+
+        public async Task<RankingPunctuation> GetByPositionAsync(short position)
+        {
+            return await _rankingPunctuationRepository.GetByPositionAsync(position);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace PokerSNTS.API
         public static void ResolveDependencyInjection(this IServiceCollection services)
         {
             //Notification
-            services.AddScoped<IDomainNotificationHandler, DomainNotificationHandler>();
+            services.AddScoped<INotificationHandler, NotificationHandler>();
 
             //Data
             services.AddScoped<PokerContext>();
@@ -28,6 +28,7 @@ namespace PokerSNTS.API
             services.AddScoped<IRoundRepository, RoundRepository>();
 
             //Service
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<IRoundPunctuationService, RoundPunctuationService>();
             services.AddScoped<IRankingService, RankingService>();

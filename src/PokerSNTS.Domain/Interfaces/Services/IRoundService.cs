@@ -7,8 +7,10 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IRoundService
     {
-        Task<Round> AddAsync(Round round);
-        Task<Round> UpdateAsync(Guid id, Round round);
-        Task<IEnumerable<Round>> GetRoundByRankingIdAsync(Guid rankingId);
+        Task AddAsync(Round round);
+        Task UpdateAsync(Guid id, Round round);
+        Task<IEnumerable<Round>> GetAllAsync();
+        Task<Round> GetByIdAsync(Guid id);
+        Task<IEnumerable<Round>> GetByRankingIdAsync(Guid rankingId);
     }
 }

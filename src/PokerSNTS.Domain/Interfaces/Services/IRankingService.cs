@@ -8,9 +8,10 @@ namespace PokerSNTS.Domain.Interfaces.Services
 {
     public interface IRankingService
     {
-        Task<Ranking> AddAsync(Ranking ranking);
-        Task<Ranking> UpdateAsync(Guid id, Ranking ranking);
+        Task AddAsync(Ranking ranking);
+        Task UpdateAsync(Guid id, Ranking ranking);
         Task<IEnumerable<Ranking>> GetAllAsync();
+        Task<Ranking> GetByIdAsync(Guid id);
         Task<IEnumerable<RankingOverallDTO>> GetOverallById(Guid id);
         Task<IEnumerable<RankingOverallDTO>> GetOverallByPeriod(DateTime initialDate, DateTime finalDate);
     }

@@ -5,24 +5,14 @@ using System.Linq;
 namespace PokerSNTS.API.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("v1/[controller]")]
     public abstract class BaseController : ControllerBase
     {
-        private readonly IDomainNotificationHandler _notifications;
+        private readonly INotificationHandler _notifications;
 
-        protected BaseController(IDomainNotificationHandler notifications)
+        protected BaseController(INotificationHandler notifications)
         {
             _notifications = notifications;
-        }
-
-        protected new IActionResult Response(object result = null)
-        {
-            if (_notifications.HasNotification())
-            {
-                return BadRequest(new { Messages = _notifications.GetNotifications().Select(x => x.Value) } );
-            }
-
-            return Ok(new { data = result });
         }
 
         protected void NotifyModelStateError()
@@ -31,13 +21,26 @@ namespace PokerSNTS.API.Controllers
             foreach (var erro in erros)
             {
                 var mensagemErro = erro.Exception == null ? erro.ErrorMessage : erro.Exception.Message;
-                AddError(mensagemErro);
+                AddNotification(mensagemErro);
             }
         }
 
-        protected void AddError(string errorMessage)
+        protected void AddNotification(string message)
         {
-            _notifications.HandleNotification("ApiValidation", errorMessage);
+            _notifications.HandleNotification("ApiValidation", message);
+        }
+
+        protected bool ValidOperation()
+        {
+            return !_notifications.HasNotification();
+        }
+
+        protected IActionResult ResponseInvalid()
+        {
+            return BadRequest(new
+            {
+                Messages = _notifications.GetNotifications().Select(x => x.Value)
+            });
         }
     }
 }

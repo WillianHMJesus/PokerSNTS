@@ -12,52 +12,47 @@ namespace PokerSNTS.Domain.Services
     public class RegulationService : BaseService, IRegulationService
     {
         private readonly IRegulationRepository _regulationRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IDomainNotificationHandler _notifications;
 
         public RegulationService(IRegulationRepository regulationRepository,
             IUnitOfWork unitOfWork,
-            IDomainNotificationHandler notifications)
-            : base(notifications)
+            INotificationHandler notifications)
+            : base(unitOfWork, notifications)
         {
             _regulationRepository = regulationRepository;
-            _unitOfWork = unitOfWork;
-            _notifications = notifications;
         }
 
-        public async Task<Regulation> AddAsync(Regulation regulation)
+        public async Task AddAsync(Regulation regulation)
         {
             if(ValidateEntity(regulation))
             {
                 _regulationRepository.Add(regulation);
-                if (await _unitOfWork.CommitAsync()) return regulation;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar o regulamento.");
+            }
         }
 
-        public async Task<Regulation> UpdateAsync(Guid id, Regulation regulation)
+        public async Task UpdateAsync(Guid id, Regulation regulation)
         {
             var existingRegulation = await _regulationRepository.GetByIdAsync(id);
-            if (existingRegulation == null)
-            {
-                _notifications.HandleNotification("DomainValidation", "Regulamento não encontrado");
-                return null;
-            }
+            if (existingRegulation == null) AddNotification("Regulamento não encontrado.");
 
             existingRegulation.Update(regulation.Description);
             if(ValidateEntity(existingRegulation))
             {
                 _regulationRepository.Update(existingRegulation);
-                if (await _unitOfWork.CommitAsync()) return existingRegulation;
-            }
 
-            return null;
+                if (!await CommitAsync()) AddNotification("Não foi possível atualizar o regulamento.");
+            }
         }
 
         public async Task<IEnumerable<Regulation>> GetAllAsync()
         {
             return await _regulationRepository.GetAllAsync();
+        }
+
+        public async Task<Regulation> GetByIdAsync(Guid id)
+        {
+            return await _regulationRepository.GetByIdAsync(id);
         }
     }
 }
