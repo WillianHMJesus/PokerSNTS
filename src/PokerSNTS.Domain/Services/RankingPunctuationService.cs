@@ -5,6 +5,7 @@ using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -23,25 +24,34 @@ namespace PokerSNTS.Domain.Services
 
         public async Task AddAsync(RankingPunctuation rankingPunctuation)
         {
+            var rankingPunctuations = await GetAllAsync();
+
+            if (rankingPunctuations.Any(x => x.Position == rankingPunctuation.Position))
+                AddNotification("Essa posição do ranking já foi cadastrada anteriormente.");
+
             if (ValidateEntity(rankingPunctuation))
             {
                 _rankingPunctuationRepository.Add(rankingPunctuation);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar a pontuação do ranking.");
+                if (!await CommitAsync())
+                    AddNotification("Não foi possível cadastrar a pontuação do ranking.");
             }
         }
 
         public async Task UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
         {
             var existingRankingPunctuation = await _rankingPunctuationRepository.GetByIdAsync(id);
-            if (existingRankingPunctuation == null) AddNotification("Pontuação do ranking não foi encontrada.");
+
+            if (existingRankingPunctuation == null) 
+                AddNotification("Pontuação do ranking não foi encontrada.");
 
             existingRankingPunctuation.Update(rankingPunctuation.Position, rankingPunctuation.Punctuation);
             if (ValidateEntity(existingRankingPunctuation))
             {
                 _rankingPunctuationRepository.Update(existingRankingPunctuation);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível atualizar a pontuação do ranking");
+                if (!await CommitAsync()) 
+                    AddNotification("Não foi possível atualizar a pontuação do ranking");
             }
         }
 

@@ -5,6 +5,7 @@ using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -23,25 +24,34 @@ namespace PokerSNTS.Domain.Services
 
         public async Task AddAsync(Player player)
         {
+            var players = await GetAllAsync();
+
+            if(players.Any(x => x.Name == player.Name)) 
+                AddNotification("Já existe outro jogador cadastrado com esse nome.");
+
             if (ValidateEntity(player))
             {
                 _playerRepository.Add(player);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar o jogador.");
+                if (!await CommitAsync()) 
+                    AddNotification("Não foi possível cadastrar o jogador.");
             }
         }
 
         public async Task UpdateAsync(Guid id, Player player)
         {
             var existingPlayer = await _playerRepository.GetByIdAsync(id);
-            if (existingPlayer == null) AddNotification("Jogador não encontrado.");
+
+            if (existingPlayer == null) 
+                AddNotification("Jogador não encontrado.");
 
             existingPlayer.Update(player.Name);
             if (ValidateEntity(existingPlayer))
             {
                 _playerRepository.Update(existingPlayer);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível atualizar o jogador.");
+                if (!await CommitAsync()) 
+                    AddNotification("Não foi possível atualizar o jogador.");
             }
         }
 

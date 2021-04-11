@@ -5,6 +5,7 @@ using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -23,25 +24,34 @@ namespace PokerSNTS.Domain.Services
 
         public async Task AddAsync(Regulation regulation)
         {
-            if(ValidateEntity(regulation))
+            var regulations = await GetAllAsync();
+
+            if (regulations.Any(x => x.Description == regulation.Description))
+                AddNotification("Já existe outro regulamento cadastrado com essa descrição.");
+
+            if (ValidateEntity(regulation))
             {
                 _regulationRepository.Add(regulation);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar o regulamento.");
+                if (!await CommitAsync())
+                    AddNotification("Não foi possível cadastrar o regulamento.");
             }
         }
 
         public async Task UpdateAsync(Guid id, Regulation regulation)
         {
             var existingRegulation = await _regulationRepository.GetByIdAsync(id);
-            if (existingRegulation == null) AddNotification("Regulamento não encontrado.");
+
+            if (existingRegulation == null)
+                AddNotification("Regulamento não encontrado.");
 
             existingRegulation.Update(regulation.Description);
-            if(ValidateEntity(existingRegulation))
+            if (ValidateEntity(existingRegulation))
             {
                 _regulationRepository.Update(existingRegulation);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível atualizar o regulamento.");
+                if (!await CommitAsync())
+                    AddNotification("Não foi possível atualizar o regulamento.");
             }
         }
 

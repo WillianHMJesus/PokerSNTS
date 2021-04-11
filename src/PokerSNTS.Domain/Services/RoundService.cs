@@ -5,6 +5,7 @@ using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -26,25 +27,34 @@ namespace PokerSNTS.Domain.Services
 
         public async Task AddAsync(Round round)
         {
+            var rounds = await GetAllAsync();
+
+            if (rounds.Any(x => x.Description == round.Description))
+                AddNotification("Já existem outra rodada cadastrada com essa descrição.");
+
             if (await ValidateRoundAsync(round))
             {
                 _roundRepository.Add(round);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar a rodada.");
+                if (!await CommitAsync()) 
+                    AddNotification("Não foi possível cadastrar a rodada.");
             }
         }
 
         public async Task UpdateAsync(Guid id, Round round)
         {
             var existingRound = await _roundRepository.GetByIdAsync(id);
-            if (existingRound == null) AddNotification("Rodada não encontrada.");
+
+            if (existingRound == null) 
+                AddNotification("Rodada não encontrada.");
 
             existingRound.Update(round.Description, round.Date, round.RankingId);
             if (await ValidateRoundAsync(existingRound))
             {
                 _roundRepository.Update(existingRound);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível atualizar a rodada.");
+                if (!await CommitAsync()) 
+                    AddNotification("Não foi possível atualizar a rodada.");
             }
         }
 

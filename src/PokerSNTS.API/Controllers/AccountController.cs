@@ -27,6 +27,7 @@ namespace PokerSNTS.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] UserInputModel model)
         {
+            var teste = ControllerContext.HttpContext.Request.Path;
             if (ModelState.IsValid)
             {
                 var encryptedPassword = CryptographyHelper.Sha256(model.Password);
@@ -34,7 +35,7 @@ namespace PokerSNTS.API.Controllers
                 await _userService.AddAsync(user);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetByIdAsync), user.Id);
+                    return Created(GetRouteById(user.Id), new { id = user.Id });
 
                 return ResponseInvalid();
             }
@@ -115,13 +116,5 @@ namespace PokerSNTS.API.Controllers
 
             return ResponseInvalid();
         }
-
-        [AllowAnonymous]
-        [HttpGet("Anonymous")]
-        public IActionResult Anonymous() => Ok("Olá usuário Anônimo");
-
-        [Authorize]
-        [HttpGet("Authorize")]
-        public IActionResult Authorize() => Ok(string.Format("Olá {0}", User.Identity.Name));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
 using PokerSNTS.Domain.Adapters;
 using PokerSNTS.Domain.Entities;
@@ -30,7 +31,7 @@ namespace PokerSNTS.API.Controllers
                 await _regulationService.AddAsync(regulation);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetByIdAsync), regulation.Id);
+                    return Created(GetRouteById(regulation.Id), new { id = regulation.Id });
 
                 return ResponseInvalid();
             }
@@ -65,6 +66,7 @@ namespace PokerSNTS.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync()
         {
             var regulations = await _regulationService.GetAllAsync();

@@ -19,7 +19,7 @@ namespace PokerSNTS.Infra.Data.Mappings
             builder.Property(x => x.Password)
                 .IsRequired()
                 .HasColumnType("varchar")
-                .HasMaxLength(50);
+                .HasMaxLength(200);
 
             builder.Ignore(x => x.ValidationResult);
         }

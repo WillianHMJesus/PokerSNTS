@@ -34,7 +34,7 @@ namespace PokerSNTS.API.Controllers
                 await _rankingService.AddAsync(ranking);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetByIdAsync), ranking.Id);
+                    return Created(GetRouteById(ranking.Id), new { id = ranking.Id });
 
                 return ResponseInvalid();
             }
@@ -90,7 +90,7 @@ namespace PokerSNTS.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}/Overrall")]
         public async Task<IActionResult> GetOverrallByIdAsync(Guid id)
         {
             var ranking = await _rankingService.GetOverallById(id);
@@ -101,7 +101,7 @@ namespace PokerSNTS.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("{initialDate}/{finalDate}")]
+        [HttpGet("Overrall/{initialDate=initialDate}/{finalDate=finalDate}")]
         public async Task<IActionResult> GetOverrallByPeriodAsync(DateTime initialDate, DateTime finalDate)
         {
             var ranking = await _rankingService.GetOverallByPeriod(initialDate, finalDate);
@@ -123,7 +123,7 @@ namespace PokerSNTS.API.Controllers
                 await _rankingPunctuationService.AddAsync(rankingPunctuation);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetPunctuationByIdAsync), rankingPunctuation.Id);
+                    return Created(GetRouteById(rankingPunctuation.Id), new { id = rankingPunctuation.Id });
 
                 return ResponseInvalid();
             }
@@ -179,8 +179,8 @@ namespace PokerSNTS.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("Punctuation/{position}")]
-        public async Task<IActionResult> GetPunctuationByPositionAsync(short position)
+        [HttpGet("Punctuation/filter")]
+        public async Task<IActionResult> GetPunctuationByPositionAsync([FromQuery]short position)
         {
             var rankingPunctuation = await _rankingPunctuationService.GetByPositionAsync(position);
 

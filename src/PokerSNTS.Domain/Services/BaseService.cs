@@ -19,11 +19,15 @@ namespace PokerSNTS.Domain.Services
 
         protected async Task<bool> CommitAsync()
         {
+            if (_notifications.HasNotification()) return false;
+
             return await _unitOfWork.CommitAsync();
         }
 
         protected bool ValidateEntity<T>(T entity) where T : Entity
         {
+            if (_notifications.HasNotification()) return false;
+
             var validationResult = entity.Validate();
             if (validationResult.IsValid) return true;
 

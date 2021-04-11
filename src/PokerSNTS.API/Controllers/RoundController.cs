@@ -34,7 +34,7 @@ namespace PokerSNTS.API.Controllers
                 await _roundService.AddAsync(round);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetByIdAsync), round.Id);
+                    return Created(GetRouteById(round.Id), new { id = round.Id });
 
                 return ResponseInvalid();
             }
@@ -68,6 +68,17 @@ namespace PokerSNTS.API.Controllers
             return ResponseInvalid();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
+        {
+            var rounds = await _roundService.GetAllAsync();
+
+            if (rounds.Any())
+                return Ok(rounds.Select(x => RoundAdapter.ToRoundDTO(x)));
+
+            return NoContent();
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -79,8 +90,8 @@ namespace PokerSNTS.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("{rankingId}")]
-        public async Task<IActionResult> GetByRankingIdAsync(Guid rankingId)
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetByRankingIdAsync([FromQuery]Guid rankingId)
         {
             var rounds = await _roundService.GetByRankingIdAsync(rankingId);
 
@@ -101,7 +112,7 @@ namespace PokerSNTS.API.Controllers
                 await _roundPunctuationService.AddAsync(roundPunctuation);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetPunctuationByIdAsync), roundPunctuation.Id);
+                    return Created(GetRouteById(roundPunctuation.Id), new { id = roundPunctuation.Id });
 
                 return ResponseInvalid();
             }
@@ -133,6 +144,17 @@ namespace PokerSNTS.API.Controllers
             NotifyModelStateError();
 
             return ResponseInvalid();
+        }
+
+        [HttpGet("Punctuation")]
+        public async Task<IActionResult> GetPunctuationAsync()
+        {
+            var roundsPunctuations = await _roundPunctuationService.GetAllAsync();
+
+            if (roundsPunctuations.Any())
+                return Ok(roundsPunctuations.Select(x => RoundPunctuationAdapter.ToRoundPunctuationDTO(x)));
+
+            return NoContent();
         }
 
         [HttpGet("Punctuation/{id}")]

@@ -10,8 +10,12 @@ namespace PokerSNTS.Domain.Helpers
         {
             var encryptedText = string.Empty;
             var sha256Managed = new SHA256Managed();
-            var hash = sha256Managed.ComputeHash(Encoding.ASCII.GetBytes(text));
-            hash.Select(x => encryptedText += x.ToString("x2"));
+            var hashs = sha256Managed.ComputeHash(Encoding.ASCII.GetBytes(text));
+
+            foreach (var hash in hashs)
+            {
+                encryptedText += hash.ToString("x2");
+            }
 
             return encryptedText;
         }

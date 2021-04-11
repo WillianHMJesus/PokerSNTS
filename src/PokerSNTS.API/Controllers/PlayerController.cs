@@ -30,7 +30,7 @@ namespace PokerSNTS.API.Controllers
                 await _playerService.AddAsync(player);
 
                 if (ValidOperation())
-                    return CreatedAtAction(nameof(GetByIdAsync), player.Id);
+                    return Created(GetRouteById(player.Id), new { id = player.Id });
 
                 return ResponseInvalid();
             }

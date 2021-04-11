@@ -26,6 +26,7 @@ namespace PokerSNTS.API
             services.AddScoped<IRankingPunctuationRepository, RankingPunctuationRepository>();
             services.AddScoped<IRegulationRepository, RegulationRepository>();
             services.AddScoped<IRoundRepository, RoundRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             //Service
             services.AddScoped<IUserRepository, UserRepository>();
@@ -35,6 +36,7 @@ namespace PokerSNTS.API
             services.AddScoped<IRankingPunctuationService, RankingPunctuationService>();
             services.AddScoped<IRegulationService, RegulationService>();
             services.AddScoped<IRoundService, RoundService>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

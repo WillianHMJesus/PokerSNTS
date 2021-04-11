@@ -30,7 +30,7 @@ namespace PokerSNTS.API
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return tokenHandler.WriteToken(token);
+            return string.Format("Bearer {0}", tokenHandler.WriteToken(token));
         }
 
         public static void ConfigureToken(this IServiceCollection services)

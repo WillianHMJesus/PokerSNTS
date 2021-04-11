@@ -46,7 +46,7 @@ GO
 CREATE TABLE [Users] (
     [Id] uniqueidentifier NOT NULL,
     [UserName] varchar(50) NOT NULL,
-    [Password] varchar(50) NOT NULL,
+    [Password] varchar(200) NOT NULL,
     [Created] datetime2 NOT NULL,
     [Actived] bit NOT NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY ([Id])

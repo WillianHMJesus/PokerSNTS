@@ -5,6 +5,7 @@ using PokerSNTS.Domain.Interfaces.UnitOfWork;
 using PokerSNTS.Domain.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
@@ -29,18 +30,26 @@ namespace PokerSNTS.Domain.Services
 
         public async Task AddAsync(RoundPunctuation roundPunctuation)
         {
+            var roundsPunctuations = await GetAllAsync();
+
+            if (roundsPunctuations.Any(x => x.PlayerId == roundPunctuation.PlayerId && x.RoundId == roundPunctuation.RoundId))
+                AddNotification("Esse jogador já tem posição para essa rodada.");
+
             if (await ValidateRoundPunctuationAsync(roundPunctuation))
             {
                 _roundPunctuationRepository.Add(roundPunctuation);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível cadastrar a pontuação da rodada.");
+                if (!await CommitAsync())
+                    AddNotification("Não foi possível cadastrar a pontuação da rodada.");
             }
         }
 
         public async Task UpdateAsync(Guid id, RoundPunctuation roundPunctuation)
         {
             var existingRoundPunctuation = await _roundPunctuationRepository.GetByIdAsync(id);
-            if (existingRoundPunctuation == null) AddNotification("Partida do jogador não encontrada.");
+
+            if (existingRoundPunctuation == null) 
+                AddNotification("Partida do jogador não encontrada.");
 
             existingRoundPunctuation.Update(
                 roundPunctuation.Position, roundPunctuation.Punctuation, roundPunctuation.PlayerId, roundPunctuation.RoundId);
@@ -48,7 +57,8 @@ namespace PokerSNTS.Domain.Services
             {
                 _roundPunctuationRepository.Update(existingRoundPunctuation);
 
-                if (!await CommitAsync()) AddNotification("Não foi possível atualizar a pontuação da rodada.");
+                if (!await CommitAsync()) 
+                    AddNotification("Não foi possível atualizar a pontuação da rodada.");
             }
         }
 

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.Domain.Notifications;
+using System;
 using System.Linq;
 
 namespace PokerSNTS.API.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("v1/[controller]")]
     public abstract class BaseController : ControllerBase
@@ -41,6 +44,11 @@ namespace PokerSNTS.API.Controllers
             {
                 Messages = _notifications.GetNotifications().Select(x => x.Value)
             });
+        }
+
+        protected string GetRouteById(Guid id)
+        {
+            return string.Format("{0}/{1}", ControllerContext.HttpContext.Request.Path, id);
         }
     }
 }
