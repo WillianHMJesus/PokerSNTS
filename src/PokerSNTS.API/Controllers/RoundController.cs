@@ -13,15 +13,15 @@ namespace PokerSNTS.API.Controllers
     public class RoundController : BaseController
     {
         private readonly IRoundService _roundService;
-        private readonly IRoundPunctuationService _roundPunctuationService;
+        private readonly IRoundPointService _roundPointService;
 
         public RoundController(IRoundService roundService,
-            IRoundPunctuationService roundPunctuationService,
+            IRoundPointService roundPointService,
             INotificationHandler notifications)
             : base(notifications)
         {
             _roundService = roundService;
-            _roundPunctuationService = roundPunctuationService;
+            _roundPointService = roundPointService;
         }
 
         #region Round
@@ -102,17 +102,17 @@ namespace PokerSNTS.API.Controllers
         }
         #endregion
 
-        #region Round Punctuation
-        [HttpPost("Punctuation")]
-        public async Task<IActionResult> PostPunctuationAsync([FromBody] RoundPunctuationInputModel model)
+        #region Round Point
+        [HttpPost("Point")]
+        public async Task<IActionResult> PostPointAsync([FromBody] RoundPointInputModel model)
         {
             if (ModelState.IsValid)
             {
-                var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
-                await _roundPunctuationService.AddAsync(roundPunctuation);
+                var roundPoint = new RoundPoint(model.Position, model.Point, model.PlayerId, model.RoundId);
+                await _roundPointService.AddAsync(roundPoint);
 
                 if (ValidOperation())
-                    return Created(GetRouteById(roundPunctuation.Id), new { id = roundPunctuation.Id });
+                    return Created(GetRouteById(roundPoint.Id), new { id = roundPoint.Id });
 
                 return ResponseInvalid();
             }
@@ -122,8 +122,8 @@ namespace PokerSNTS.API.Controllers
             return ResponseInvalid();
         }
 
-        [HttpPut("Punctuation/{id}")]
-        public async Task<IActionResult> PutPunctuationAsync(Guid id, [FromBody] RoundPunctuationInputModel model)
+        [HttpPut("Point/{id}")]
+        public async Task<IActionResult> PutPointAsync(Guid id, [FromBody] RoundPointInputModel model)
         {
             if (default(Guid).Equals(id))
             {
@@ -133,8 +133,8 @@ namespace PokerSNTS.API.Controllers
 
             if (ModelState.IsValid)
             {
-                var roundPunctuation = new RoundPunctuation(model.Position, model.Punctuation, model.PlayerId, model.RoundId);
-                await _roundPunctuationService.UpdateAsync(id, roundPunctuation);
+                var roundPoint = new RoundPoint(model.Position, model.Point, model.PlayerId, model.RoundId);
+                await _roundPointService.UpdateAsync(id, roundPoint);
 
                 if (ValidOperation()) return NoContent();
 
@@ -146,24 +146,24 @@ namespace PokerSNTS.API.Controllers
             return ResponseInvalid();
         }
 
-        [HttpGet("Punctuation")]
-        public async Task<IActionResult> GetPunctuationAsync()
+        [HttpGet("Point")]
+        public async Task<IActionResult> GetPointAsync()
         {
-            var roundsPunctuations = await _roundPunctuationService.GetAllAsync();
+            var roundsPoints = await _roundPointService.GetAllAsync();
 
-            if (roundsPunctuations.Any())
-                return Ok(roundsPunctuations.Select(x => RoundPunctuationAdapter.ToRoundPunctuationDTO(x)));
+            if (roundsPoints.Any())
+                return Ok(roundsPoints.Select(x => RoundPointAdapter.ToRoundPointDTO(x)));
 
             return NoContent();
         }
 
-        [HttpGet("Punctuation/{id}")]
-        public async Task<IActionResult> GetPunctuationByIdAsync(Guid id)
+        [HttpGet("Point/{id}")]
+        public async Task<IActionResult> GetPointByIdAsync(Guid id)
         {
-            var roundPunctuation = await _roundPunctuationService.GetByIdAsync(id);
+            var roundPoint = await _roundPointService.GetByIdAsync(id);
 
-            if (roundPunctuation != null)
-                return Ok(RoundPunctuationAdapter.ToRoundPunctuationDTO(roundPunctuation));
+            if (roundPoint != null)
+                return Ok(RoundPointAdapter.ToRoundPointDTO(roundPoint));
 
             return NoContent();
         }

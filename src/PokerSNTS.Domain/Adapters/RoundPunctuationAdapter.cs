@@ -3,11 +3,11 @@ using PokerSNTS.Domain.Entities;
 
 namespace PokerSNTS.Domain.Adapters
 {
-    public class RoundPunctuationAdapter
+    public class RoundPointAdapter
     {
-        public static RoundPunctuationDTO ToRoundPunctuationDTO(RoundPunctuation roundPunctuation)
+        public static RoundPointDTO ToRoundPointDTO(RoundPoint roundPoint)
         {
-            return new RoundPunctuationDTO(roundPunctuation.Id, roundPunctuation.Position, roundPunctuation.Punctuation, roundPunctuation.PlayerId, roundPunctuation.RoundId);
+            return new RoundPointDTO(roundPoint.Id, roundPoint.Position, roundPoint.Point, roundPoint.PlayerId, roundPoint.RoundId);
         }
     }
 }

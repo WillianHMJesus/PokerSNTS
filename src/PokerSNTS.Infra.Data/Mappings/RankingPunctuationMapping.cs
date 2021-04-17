@@ -4,11 +4,11 @@ using PokerSNTS.Domain.Entities;
 
 namespace PokerSNTS.Infra.Data.Mappings
 {
-    public class RankingPunctuationMapping : IEntityTypeConfiguration<RankingPunctuation>
+    public class RankingPointMapping : IEntityTypeConfiguration<RankingPoint>
     {
-        public void Configure(EntityTypeBuilder<RankingPunctuation> builder)
+        public void Configure(EntityTypeBuilder<RankingPoint> builder)
         {
-            builder.ToTable("RankingPunctuations");
+            builder.ToTable("RankingPoints");
             builder.HasKey(x => x.Id);
 
             builder.Ignore(x => x.ValidationResult);

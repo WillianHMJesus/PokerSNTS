@@ -2,6 +2,6 @@
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
 {
-    public interface IRoundPunctuationRepository : IRepository<RoundPunctuation>
+    public interface IRoundPointRepository : IRepository<RoundPoint>
     { }
 }

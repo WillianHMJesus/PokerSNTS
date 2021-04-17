@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Services
 {
-    public interface IRankingPunctuationService
+    public interface IRankingPointService
     {
-        Task AddAsync(RankingPunctuation rankingPunctuation);
-        Task UpdateAsync(Guid id, RankingPunctuation rankingPunctuation);
-        Task<IEnumerable<RankingPunctuation>> GetAllAsync();
-        Task<RankingPunctuation> GetByIdAsync(Guid id);
-        Task<RankingPunctuation> GetByPositionAsync(short position);
+        Task AddAsync(RankingPoint rankingPoint);
+        Task UpdateAsync(Guid id, RankingPoint rankingPoint);
+        Task<IEnumerable<RankingPoint>> GetAllAsync();
+        Task<RankingPoint> GetByIdAsync(Guid id);
+        Task<RankingPoint> GetByPositionAsync(short position);
     }
 }

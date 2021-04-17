@@ -2,17 +2,17 @@
 
 namespace PokerSNTS.Domain.DTOs
 {
-    public class RankingPunctuationDTO
+    public class RankingPointDTO
     {
-        public RankingPunctuationDTO(Guid id, short position, short punctuation)
+        public RankingPointDTO(Guid id, short position, short Point)
         {
             Id = id;
             Position = position;
-            Punctuation = punctuation;
+            Point = Point;
         }
 
         public Guid Id { get; private set; }
         public short Position { get; private set; }
-        public short Punctuation { get; private set; }
+        public short Point { get; private set; }
     }
 }

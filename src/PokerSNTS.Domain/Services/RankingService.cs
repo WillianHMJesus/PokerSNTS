@@ -1,5 +1,4 @@
-﻿using PokerSNTS.Domain.DTOs;
-using PokerSNTS.Domain.Entities;
+﻿using PokerSNTS.Domain.Entities;
 using PokerSNTS.Domain.Interfaces.Repositories;
 using PokerSNTS.Domain.Interfaces.Services;
 using PokerSNTS.Domain.Interfaces.UnitOfWork;
@@ -66,14 +65,9 @@ namespace PokerSNTS.Domain.Services
             return await _rankingRepository.GetByIdAsync(id);
         }
 
-        public async Task<IEnumerable<RankingOverallDTO>> GetOverallById(Guid id)
+        public async Task<Ranking> GetOverallById(Guid id)
         {
             return await _rankingRepository.GetOverallById(id);
-        }
-
-        public async Task<IEnumerable<RankingOverallDTO>> GetOverallByPeriod(DateTime initialDate, DateTime finalDate)
-        {
-            return await _rankingRepository.GetOverallByPeriod(initialDate, finalDate);
         }
     }
 }

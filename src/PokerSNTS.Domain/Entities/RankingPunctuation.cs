@@ -3,40 +3,40 @@ using FluentValidation.Results;
 
 namespace PokerSNTS.Domain.Entities
 {
-    public class RankingPunctuation : Entity
+    public class RankingPoint : Entity
     {
-        public RankingPunctuation(short position, short punctuation)
+        public RankingPoint(short position, short Point)
         {
             Position = position;
-            Punctuation = punctuation;
+            Point = Point;
         }
 
-        protected RankingPunctuation() { }
+        protected RankingPoint() { }
 
         public short Position { get; private set; }
-        public short Punctuation { get; private set; }
+        public short Point { get; private set; }
 
         public override ValidationResult Validate()
         {
-            var rankingPunctuationValidator = new RankingPunctuationValidator();
-            var validationResult = rankingPunctuationValidator.Validate(this);
+            var rankingPointValidator = new RankingPointValidator();
+            var validationResult = rankingPointValidator.Validate(this);
             SetValidationResult(validationResult);
 
             return validationResult;
         }
 
-        public void Update(short position, short punctuation)
+        public void Update(short position, short Point)
         {
             Position = position;
-            Punctuation = punctuation;
+            Point = Point;
         }
 
-        private class RankingPunctuationValidator : AbstractValidator<RankingPunctuation>
+        private class RankingPointValidator : AbstractValidator<RankingPoint>
         {
-            public RankingPunctuationValidator()
+            public RankingPointValidator()
             {
                 RuleFor(x => x.Position).NotNull().NotEqual(default(short)).WithMessage("A posição do ranking não foi informada.");
-                RuleFor(x => x.Punctuation).NotNull().NotEqual(default(short)).WithMessage("A pontuação do ranking não foi informada.");
+                RuleFor(x => x.Point).NotNull().NotEqual(default(short)).WithMessage("A pontuação do ranking não foi informada.");
             }
         }
     }

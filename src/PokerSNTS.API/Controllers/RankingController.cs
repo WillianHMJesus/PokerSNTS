@@ -14,14 +14,14 @@ namespace PokerSNTS.API.Controllers
     public class RankingController : BaseController
     {
         private readonly IRankingService _rankingService;
-        private readonly IRankingPunctuationService _rankingPunctuationService;
+        private readonly IRankingPointService _rankingPointService;
 
         public RankingController(IRankingService rankingService,
-            IRankingPunctuationService rankingPunctuationService,
+            IRankingPointService rankingPointService,
             INotificationHandler notification) : base(notification)
         {
             _rankingService = rankingService;
-            _rankingPunctuationService = rankingPunctuationService;
+            _rankingPointService = rankingPointService;
         }
 
         #region Ranking
@@ -95,35 +95,24 @@ namespace PokerSNTS.API.Controllers
         {
             var ranking = await _rankingService.GetOverallById(id);
 
-            if (ranking.Any())
-                return Ok(ranking);
-
-            return NoContent();
-        }
-
-        [HttpGet("Overrall/{initialDate=initialDate}/{finalDate=finalDate}")]
-        public async Task<IActionResult> GetOverrallByPeriodAsync(DateTime initialDate, DateTime finalDate)
-        {
-            var ranking = await _rankingService.GetOverallByPeriod(initialDate, finalDate);
-
-            if (ranking.Any())
-                return Ok(ranking);
+            if (ranking != null)
+                return Ok(RankingAdapter.ToRankingOverallDTO(ranking));
 
             return NoContent();
         }
         #endregion
 
-        #region Ranking Punctuation
-        [HttpPost("Punctuation")]
-        public async Task<IActionResult> PostAsync([FromBody] RankingPunctuationInputModel model)
+        #region Ranking Point
+        [HttpPost("Point")]
+        public async Task<IActionResult> PostAsync([FromBody] RankingPointInputModel model)
         {
             if (ModelState.IsValid)
             {
-                var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
-                await _rankingPunctuationService.AddAsync(rankingPunctuation);
+                var rankingPoint = new RankingPoint(model.Position, model.Point);
+                await _rankingPointService.AddAsync(rankingPoint);
 
                 if (ValidOperation())
-                    return Created(GetRouteById(rankingPunctuation.Id), new { id = rankingPunctuation.Id });
+                    return Created(GetRouteById(rankingPoint.Id), new { id = rankingPoint.Id });
 
                 return ResponseInvalid();
             }
@@ -133,8 +122,8 @@ namespace PokerSNTS.API.Controllers
             return ResponseInvalid();
         }
 
-        [HttpPut("Punctuation/{id}")]
-        public async Task<IActionResult> PutAsync(Guid id, [FromBody] RankingPunctuationInputModel model)
+        [HttpPut("Point/{id}")]
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] RankingPointInputModel model)
         {
             if (default(Guid).Equals(id))
             {
@@ -144,8 +133,8 @@ namespace PokerSNTS.API.Controllers
 
             if (ModelState.IsValid)
             {
-                var rankingPunctuation = new RankingPunctuation(model.Position, model.Punctuation);
-                await _rankingPunctuationService.UpdateAsync(id, rankingPunctuation);
+                var rankingPoint = new RankingPoint(model.Position, model.Point);
+                await _rankingPointService.UpdateAsync(id, rankingPoint);
 
                 if (ValidOperation()) return NoContent();
 
@@ -157,35 +146,35 @@ namespace PokerSNTS.API.Controllers
             return ResponseInvalid();
         }
 
-        [HttpGet("Punctuation")]
-        public async Task<IActionResult> GetPunctuationAsync()
+        [HttpGet("Point")]
+        public async Task<IActionResult> GetPointAsync()
         {
-            var rankingPunctuations = await _rankingPunctuationService.GetAllAsync();
+            var rankingPoints = await _rankingPointService.GetAllAsync();
 
-            if (rankingPunctuations.Any())
-                return Ok(rankingPunctuations.Select(x => RankingPunctuationAdapter.ToRankingPunctuationDTO(x)));
+            if (rankingPoints.Any())
+                return Ok(rankingPoints.Select(x => RankingPointAdapter.ToRankingPointDTO(x)));
 
             return NoContent();
         }
 
-        [HttpGet("Punctuation/{id}")]
-        public async Task<IActionResult> GetPunctuationByIdAsync(Guid id)
+        [HttpGet("Point/{id}")]
+        public async Task<IActionResult> GetPointByIdAsync(Guid id)
         {
-            var rankingPunctuation = await _rankingPunctuationService.GetByIdAsync(id);
+            var rankingPoint = await _rankingPointService.GetByIdAsync(id);
 
-            if (rankingPunctuation != null)
-                return Ok(RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation));
+            if (rankingPoint != null)
+                return Ok(RankingPointAdapter.ToRankingPointDTO(rankingPoint));
 
             return NoContent();
         }
 
-        [HttpGet("Punctuation/filter")]
-        public async Task<IActionResult> GetPunctuationByPositionAsync([FromQuery]short position)
+        [HttpGet("Point/filter")]
+        public async Task<IActionResult> GetPointByPositionAsync([FromQuery]short position)
         {
-            var rankingPunctuation = await _rankingPunctuationService.GetByPositionAsync(position);
+            var rankingPoint = await _rankingPointService.GetByPositionAsync(position);
 
-            if (rankingPunctuation != null)
-                return Ok(RankingPunctuationAdapter.ToRankingPunctuationDTO(rankingPunctuation));
+            if (rankingPoint != null)
+                return Ok(RankingPointAdapter.ToRankingPointDTO(rankingPoint));
 
             return NoContent();
         }

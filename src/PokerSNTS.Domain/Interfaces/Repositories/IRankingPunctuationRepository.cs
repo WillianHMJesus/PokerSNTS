@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Repositories
 {
-    public interface IRankingPunctuationRepository : IRepository<RankingPunctuation>
+    public interface IRankingPointRepository : IRepository<RankingPoint>
     {
-        Task<RankingPunctuation> GetByPositionAsync(short position);
+        Task<RankingPoint> GetByPositionAsync(short position);
     }
 }

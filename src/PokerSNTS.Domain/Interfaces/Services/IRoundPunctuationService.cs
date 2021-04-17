@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Interfaces.Services
 {
-    public interface IRoundPunctuationService
+    public interface IRoundPointService
     {
-        Task AddAsync(RoundPunctuation roundPunctuation);
-        Task UpdateAsync(Guid id, RoundPunctuation roundPunctuation);
-        Task<IEnumerable<RoundPunctuation>> GetAllAsync();
-        Task<RoundPunctuation> GetByIdAsync(Guid id);
+        Task AddAsync(RoundPoint roundPoint);
+        Task UpdateAsync(Guid id, RoundPoint roundPoint);
+        Task<IEnumerable<RoundPoint>> GetAllAsync();
+        Task<RoundPoint> GetByIdAsync(Guid id);
     }
 }

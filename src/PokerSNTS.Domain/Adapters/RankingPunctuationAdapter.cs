@@ -3,11 +3,11 @@ using PokerSNTS.Domain.Entities;
 
 namespace PokerSNTS.Domain.Adapters
 {
-    public class RankingPunctuationAdapter
+    public class RankingPointAdapter
     {
-        public static RankingPunctuationDTO ToRankingPunctuationDTO(RankingPunctuation rankingPunctuation)
+        public static RankingPointDTO ToRankingPointDTO(RankingPoint rankingPoint)
         {
-            return new RankingPunctuationDTO(rankingPunctuation.Id, rankingPunctuation.Position, rankingPunctuation.Punctuation);
+            return new RankingPointDTO(rankingPoint.Id, rankingPoint.Position, rankingPoint.Point);
         }
     }
 }

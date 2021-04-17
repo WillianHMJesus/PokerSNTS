@@ -22,13 +22,13 @@ CREATE TABLE [Ranking] (
 GO
 
 
-CREATE TABLE [RankingPunctuations] (
+CREATE TABLE [RankingPoints] (
     [Id] uniqueidentifier NOT NULL,
     [Position] smallint NOT NULL,
-    [Punctuation] smallint NOT NULL,
+    [Point] smallint NOT NULL,
     [Created] datetime2 NOT NULL,
     [Actived] bit NOT NULL,
-    CONSTRAINT [PK_RankingPunctuations] PRIMARY KEY ([Id])
+    CONSTRAINT [PK_RankingPoints] PRIMARY KEY ([Id])
 );
 GO
 
@@ -67,17 +67,17 @@ CREATE TABLE [Rounds] (
 GO
 
 
-CREATE TABLE [RoundsPunctuations] (
+CREATE TABLE [RoundsPoints] (
     [Id] uniqueidentifier NOT NULL,
     [Position] smallint NOT NULL,
-    [Punctuation] smallint NOT NULL,
+    [Point] smallint NOT NULL,
     [PlayerId] uniqueidentifier NOT NULL,
     [RoundId] uniqueidentifier NOT NULL,
     [Created] datetime2 NOT NULL,
     [Actived] bit NOT NULL,
-    CONSTRAINT [PK_RoundsPunctuations] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_RoundsPunctuations_Players_PlayerId] FOREIGN KEY ([PlayerId]) REFERENCES [Players] ([Id]) ON DELETE CASCADE,
-    CONSTRAINT [FK_RoundsPunctuations_Rounds_RoundId] FOREIGN KEY ([RoundId]) REFERENCES [Rounds] ([Id]) ON DELETE CASCADE
+    CONSTRAINT [PK_RoundsPoints] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_RoundsPoints_Players_PlayerId] FOREIGN KEY ([PlayerId]) REFERENCES [Players] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_RoundsPoints_Rounds_RoundId] FOREIGN KEY ([RoundId]) REFERENCES [Rounds] ([Id]) ON DELETE CASCADE
 );
 GO
 
@@ -86,11 +86,11 @@ CREATE INDEX [IX_Rounds_RankingId] ON [Rounds] ([RankingId]);
 GO
 
 
-CREATE INDEX [IX_RoundsPunctuations_PlayerId] ON [RoundsPunctuations] ([PlayerId]);
+CREATE INDEX [IX_RoundsPoints_PlayerId] ON [RoundsPoints] ([PlayerId]);
 GO
 
 
-CREATE INDEX [IX_RoundsPunctuations_RoundId] ON [RoundsPunctuations] ([RoundId]);
+CREATE INDEX [IX_RoundsPoints_RoundId] ON [RoundsPoints] ([RoundId]);
 GO
 
 

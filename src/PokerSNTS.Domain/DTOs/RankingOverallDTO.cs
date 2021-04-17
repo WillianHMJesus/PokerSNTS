@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace PokerSNTS.Domain.DTOs
 {
@@ -8,11 +6,10 @@ namespace PokerSNTS.Domain.DTOs
     {
         public RankingOverallDTO()
         {
-            Punctuations = new List<PunctuationOverallDTO>();
+            Players = new List<PlayerRankingDTO>();
         }
 
-        public string Name { get; set; }
-        public decimal PunctuationSum { get => Punctuations.Sum(x => x.Punctuation); }
-        public ICollection<PunctuationOverallDTO> Punctuations { get; set; }
+        public string Description { get; set; }
+        public ICollection<PlayerRankingDTO> Players { get; set; }
     }
 }

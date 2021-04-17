@@ -10,74 +10,74 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class RoundPunctuationService : BaseService, IRoundPunctuationService
+    public class RoundPointService : BaseService, IRoundPointService
     {
-        private readonly IRoundPunctuationRepository _roundPunctuationRepository;
+        private readonly IRoundPointRepository _roundPointRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IRoundRepository _roundRepository;
 
-        public RoundPunctuationService(IRoundPunctuationRepository roundPunctuationRepository,
+        public RoundPointService(IRoundPointRepository roundPointRepository,
             IPlayerRepository playerRepository,
             IRoundRepository roundRepository,
             IUnitOfWork unitOfWork,
             INotificationHandler notifications)
             : base(unitOfWork, notifications)
         {
-            _roundPunctuationRepository = roundPunctuationRepository;
+            _roundPointRepository = roundPointRepository;
             _playerRepository = playerRepository;
             _roundRepository = roundRepository;
         }
 
-        public async Task AddAsync(RoundPunctuation roundPunctuation)
+        public async Task AddAsync(RoundPoint roundPoint)
         {
-            var roundsPunctuations = await GetAllAsync();
+            var roundsPoints = await GetAllAsync();
 
-            if (roundsPunctuations.Any(x => x.PlayerId == roundPunctuation.PlayerId && x.RoundId == roundPunctuation.RoundId))
+            if (roundsPoints.Any(x => x.PlayerId == roundPoint.PlayerId && x.RoundId == roundPoint.RoundId))
                 AddNotification("Esse jogador já tem posição para essa rodada.");
 
-            if (await ValidateRoundPunctuationAsync(roundPunctuation))
+            if (await ValidateRoundPointAsync(roundPoint))
             {
-                _roundPunctuationRepository.Add(roundPunctuation);
+                _roundPointRepository.Add(roundPoint);
 
                 if (!await CommitAsync())
                     AddNotification("Não foi possível cadastrar a pontuação da rodada.");
             }
         }
 
-        public async Task UpdateAsync(Guid id, RoundPunctuation roundPunctuation)
+        public async Task UpdateAsync(Guid id, RoundPoint roundPoint)
         {
-            var existingRoundPunctuation = await _roundPunctuationRepository.GetByIdAsync(id);
+            var existingRoundPoint = await _roundPointRepository.GetByIdAsync(id);
 
-            if (existingRoundPunctuation == null) 
+            if (existingRoundPoint == null) 
                 AddNotification("Partida do jogador não encontrada.");
 
-            existingRoundPunctuation.Update(
-                roundPunctuation.Position, roundPunctuation.Punctuation, roundPunctuation.PlayerId, roundPunctuation.RoundId);
-            if (await ValidateRoundPunctuationAsync(existingRoundPunctuation))
+            existingRoundPoint.Update(
+                roundPoint.Position, roundPoint.Point, roundPoint.PlayerId, roundPoint.RoundId);
+            if (await ValidateRoundPointAsync(existingRoundPoint))
             {
-                _roundPunctuationRepository.Update(existingRoundPunctuation);
+                _roundPointRepository.Update(existingRoundPoint);
 
                 if (!await CommitAsync()) 
                     AddNotification("Não foi possível atualizar a pontuação da rodada.");
             }
         }
 
-        public async Task<IEnumerable<RoundPunctuation>> GetAllAsync()
+        public async Task<IEnumerable<RoundPoint>> GetAllAsync()
         {
-            return await _roundPunctuationRepository.GetAllAsync();
+            return await _roundPointRepository.GetAllAsync();
         }
 
-        public async Task<RoundPunctuation> GetByIdAsync(Guid id)
+        public async Task<RoundPoint> GetByIdAsync(Guid id)
         {
-            return await _roundPunctuationRepository.GetByIdAsync(id);
+            return await _roundPointRepository.GetByIdAsync(id);
         }
 
         #region Validate
-        private async Task<bool> ValidateRoundPunctuationAsync(RoundPunctuation roundPunctuation)
+        private async Task<bool> ValidateRoundPointAsync(RoundPoint roundPoint)
         {
-            var validationEntity = ValidateEntity(roundPunctuation);
-            var validationPlayer = await ValidatePlayerExistsAsync(roundPunctuation.PlayerId);
-            var validationRound = await ValidateRoundExistsAsync(roundPunctuation.RoundId);
+            var validationEntity = ValidateEntity(roundPoint);
+            var validationPlayer = await ValidatePlayerExistsAsync(roundPoint.PlayerId);
+            var validationRound = await ValidateRoundExistsAsync(roundPoint.RoundId);
 
             return validationEntity && validationPlayer && validationRound;
         }

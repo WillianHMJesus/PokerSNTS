@@ -16,7 +16,7 @@ namespace PokerSNTS.Infra.Data.Mappings
                 .HasColumnType("varchar")
                 .HasMaxLength(50);
 
-            builder.HasMany(x => x.RoundsPunctuations)
+            builder.HasMany(x => x.RoundsPoints)
                 .WithOne(x => x.Player)
                 .HasForeignKey(x => x.PlayerId);
 

@@ -10,64 +10,64 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Domain.Services
 {
-    public class RankingPunctuationService : BaseService, IRankingPunctuationService
+    public class RankingPointService : BaseService, IRankingPointService
     {
-        private readonly IRankingPunctuationRepository _rankingPunctuationRepository;
+        private readonly IRankingPointRepository _rankingPointRepository;
 
-        public RankingPunctuationService(IRankingPunctuationRepository rankingPunctuationRepository,
+        public RankingPointService(IRankingPointRepository rankingPointRepository,
             IUnitOfWork unitOfWork,
             INotificationHandler notifications)
             : base(unitOfWork, notifications)
         {
-            _rankingPunctuationRepository = rankingPunctuationRepository;
+            _rankingPointRepository = rankingPointRepository;
         }
 
-        public async Task AddAsync(RankingPunctuation rankingPunctuation)
+        public async Task AddAsync(RankingPoint rankingPoint)
         {
-            var rankingPunctuations = await GetAllAsync();
+            var rankingPoints = await GetAllAsync();
 
-            if (rankingPunctuations.Any(x => x.Position == rankingPunctuation.Position))
+            if (rankingPoints.Any(x => x.Position == rankingPoint.Position))
                 AddNotification("Essa posição do ranking já foi cadastrada anteriormente.");
 
-            if (ValidateEntity(rankingPunctuation))
+            if (ValidateEntity(rankingPoint))
             {
-                _rankingPunctuationRepository.Add(rankingPunctuation);
+                _rankingPointRepository.Add(rankingPoint);
 
                 if (!await CommitAsync())
                     AddNotification("Não foi possível cadastrar a pontuação do ranking.");
             }
         }
 
-        public async Task UpdateAsync(Guid id, RankingPunctuation rankingPunctuation)
+        public async Task UpdateAsync(Guid id, RankingPoint rankingPoint)
         {
-            var existingRankingPunctuation = await _rankingPunctuationRepository.GetByIdAsync(id);
+            var existingRankingPoint = await _rankingPointRepository.GetByIdAsync(id);
 
-            if (existingRankingPunctuation == null) 
+            if (existingRankingPoint == null) 
                 AddNotification("Pontuação do ranking não foi encontrada.");
 
-            existingRankingPunctuation.Update(rankingPunctuation.Position, rankingPunctuation.Punctuation);
-            if (ValidateEntity(existingRankingPunctuation))
+            existingRankingPoint.Update(rankingPoint.Position, rankingPoint.Point);
+            if (ValidateEntity(existingRankingPoint))
             {
-                _rankingPunctuationRepository.Update(existingRankingPunctuation);
+                _rankingPointRepository.Update(existingRankingPoint);
 
                 if (!await CommitAsync()) 
                     AddNotification("Não foi possível atualizar a pontuação do ranking");
             }
         }
 
-        public async Task<IEnumerable<RankingPunctuation>> GetAllAsync()
+        public async Task<IEnumerable<RankingPoint>> GetAllAsync()
         {
-            return await _rankingPunctuationRepository.GetAllAsync();
+            return await _rankingPointRepository.GetAllAsync();
         }
 
-        public async Task<RankingPunctuation> GetByIdAsync(Guid id)
+        public async Task<RankingPoint> GetByIdAsync(Guid id)
         {
-            return await _rankingPunctuationRepository.GetByIdAsync(id);
+            return await _rankingPointRepository.GetByIdAsync(id);
         }
 
-        public async Task<RankingPunctuation> GetByPositionAsync(short position)
+        public async Task<RankingPoint> GetByPositionAsync(short position)
         {
-            return await _rankingPunctuationRepository.GetByPositionAsync(position);
+            return await _rankingPointRepository.GetByPositionAsync(position);
         }
     }
 }

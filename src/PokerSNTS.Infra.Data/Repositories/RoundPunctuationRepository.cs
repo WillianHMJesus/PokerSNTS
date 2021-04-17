@@ -8,33 +8,33 @@ using System.Threading.Tasks;
 
 namespace PokerSNTS.Infra.Data.Repositories
 {
-    public class RoundPunctuationRepository : IRoundPunctuationRepository
+    public class RoundPointRepository : IRoundPointRepository
     {
         private readonly PokerContext _context;
 
-        public RoundPunctuationRepository(PokerContext context)
+        public RoundPointRepository(PokerContext context)
         {
             _context = context;
         }
 
-        public void Add(RoundPunctuation roundPunctuation)
+        public void Add(RoundPoint roundPoint)
         {
-            _context.RoundsPunctuations.Add(roundPunctuation);
+            _context.RoundsPoints.Add(roundPoint);
         }
 
-        public void Update(RoundPunctuation roundPunctuation)
+        public void Update(RoundPoint roundPoint)
         {
-            _context.RoundsPunctuations.Update(roundPunctuation);
+            _context.RoundsPoints.Update(roundPoint);
         }
 
-        public async Task<IEnumerable<RoundPunctuation>> GetAllAsync()
+        public async Task<IEnumerable<RoundPoint>> GetAllAsync()
         {
-            return await _context.RoundsPunctuations.AsNoTracking().ToListAsync();
+            return await _context.RoundsPoints.AsNoTracking().ToListAsync();
         }
 
-        public async Task<RoundPunctuation> GetByIdAsync(Guid id)
+        public async Task<RoundPoint> GetByIdAsync(Guid id)
         {
-            return await _context.RoundsPunctuations.FindAsync(id);
+            return await _context.RoundsPoints.FindAsync(id);
         }
 
         public void Dispose()

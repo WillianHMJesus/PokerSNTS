@@ -4,19 +4,19 @@ using PokerSNTS.Domain.Entities;
 
 namespace PokerSNTS.Infra.Data.Mappings
 {
-    public class RoundPunctuationMapping : IEntityTypeConfiguration<RoundPunctuation>
+    public class RoundPointMapping : IEntityTypeConfiguration<RoundPoint>
     {
-        public void Configure(EntityTypeBuilder<RoundPunctuation> builder)
+        public void Configure(EntityTypeBuilder<RoundPoint> builder)
         {
-            builder.ToTable("RoundsPunctuations");
+            builder.ToTable("RoundsPoints");
             builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.Player)
-                .WithMany(x => x.RoundsPunctuations)
+                .WithMany(x => x.RoundsPoints)
                 .HasForeignKey(x => x.PlayerId);
 
             builder.HasOne(x => x.Round)
-                .WithMany(x => x.RoundsPunctuations)
+                .WithMany(x => x.RoundsPoints)
                 .HasForeignKey(x => x.RoundId);
 
             builder.Ignore(x => x.ValidationResult);
