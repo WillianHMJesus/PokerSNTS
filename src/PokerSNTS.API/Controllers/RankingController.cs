@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PokerSNTS.API.InputModels;
 using PokerSNTS.Domain.Adapters;
 using PokerSNTS.Domain.Entities;
@@ -69,6 +70,7 @@ namespace PokerSNTS.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync()
         {
             var ranking = await _rankingService.GetAllAsync();
@@ -91,6 +93,7 @@ namespace PokerSNTS.API.Controllers
         }
 
         [HttpGet("{id}/Overrall")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetOverrallByIdAsync(Guid id)
         {
             var ranking = await _rankingService.GetOverallById(id);
