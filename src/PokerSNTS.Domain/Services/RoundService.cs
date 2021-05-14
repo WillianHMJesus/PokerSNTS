@@ -60,7 +60,8 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<IEnumerable<Round>> GetAllAsync()
         {
-            return await _roundRepository.GetAllAsync();
+            var rounds = await _roundRepository.GetAllAsync();
+            return rounds.OrderByDescending(x => x.Created);
         }
 
         public async Task<Round> GetByIdAsync(Guid id)

@@ -13,7 +13,12 @@ namespace PokerSNTS.Domain.Adapters
 
         public static RankingOverallDTO ToRankingOverallDTO(Ranking ranking)
         {
-            var rankingOverallDTO = new RankingOverallDTO() { Description = ranking.Description };
+            var rankingOverallDTO = new RankingOverallDTO()
+            { 
+                Description = ranking.Description,
+                AwardValue = ranking.AwardValue,
+                NumberRounds = ranking.Rounds.Count
+            };
 
             foreach (var roundPoint in ranking.Rounds.SelectMany(x => x.RoundsPoints))
             {
@@ -27,6 +32,8 @@ namespace PokerSNTS.Domain.Adapters
                 playerRanking.Points += roundPoint.Point;
                 playerRanking.Matches++;
             }
+
+            rankingOverallDTO.Players = rankingOverallDTO.Players.OrderByDescending(x => x.Points).ToList();
 
             return rankingOverallDTO;
         }

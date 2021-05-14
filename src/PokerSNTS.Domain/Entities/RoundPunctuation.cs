@@ -6,10 +6,10 @@ namespace PokerSNTS.Domain.Entities
 {
     public class RoundPoint : Entity
     {
-        public RoundPoint(short position, short Point, Guid playerId, Guid roundId)
+        public RoundPoint(short position, short point, Guid playerId, Guid roundId)
         {
             Position = position;
-            Point = Point;
+            Point = point;
             PlayerId = playerId;
             RoundId = roundId;
         }

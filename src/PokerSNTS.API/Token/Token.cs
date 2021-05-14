@@ -25,7 +25,7 @@ namespace PokerSNTS.API
                 {
                     new Claim(ClaimTypes.Name, user.UserName.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(expirationTime),
+                Expires = expirationDate,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

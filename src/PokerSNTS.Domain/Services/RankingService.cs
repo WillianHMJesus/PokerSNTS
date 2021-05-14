@@ -57,7 +57,8 @@ namespace PokerSNTS.Domain.Services
 
         public async Task<IEnumerable<Ranking>> GetAllAsync()
         {
-            return await _rankingRepository.GetAllAsync();
+            var rankings = await _rankingRepository.GetAllAsync();
+            return rankings.OrderByDescending(x => x.Created);
         }
 
         public async Task<Ranking> GetByIdAsync(Guid id)
