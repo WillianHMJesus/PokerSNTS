@@ -29,7 +29,7 @@ namespace PokerSNTS.Domain.Services
         {
             var rounds = await GetAllAsync();
 
-            if (rounds.Any(x => x.Description == round.Description))
+            if (rounds.Any(x => x.Description == round.Description && x.RankingId == round.RankingId))
                 AddNotification("Já existem outra rodada cadastrada com essa descrição.");
 
             if (await ValidateRoundAsync(round))

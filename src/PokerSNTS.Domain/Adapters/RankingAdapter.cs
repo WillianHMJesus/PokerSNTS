@@ -16,7 +16,7 @@ namespace PokerSNTS.Domain.Adapters
             var rankingOverallDTO = new RankingOverallDTO()
             { 
                 Description = ranking.Description,
-                AwardValue = ranking.AwardValue,
+                AwardValue = ranking.AwardValue ?? 0,
                 NumberRounds = ranking.Rounds.Count
             };
 

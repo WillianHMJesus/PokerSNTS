@@ -103,7 +103,7 @@ namespace PokerSNTS.API.Controllers
                 if(ValidOperation())
                 {
                     var accessToken = Token.GenerateToken(user);
-                    var tokenDTO = new TokenDTO(accessToken, Token.expirationDate);
+                    var tokenDTO = new TokenDTO(accessToken, Token.GetExpiresToken());
                     var userDTO = UserAdapter.ToUserDTO(user, tokenDTO);
 
                     return Ok(userDTO);

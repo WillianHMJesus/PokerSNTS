@@ -13,8 +13,6 @@ namespace PokerSNTS.API
     {
         const string secret = "061716709562a013e1919db61db5a9544d1f29178d1dd433171de8ae014ea688";
         const double expirationTime = 2;
-        private static byte[] _key = Encoding.ASCII.GetBytes(secret);
-        public static DateTime expirationDate = DateTime.UtcNow.AddHours(expirationTime);
 
         public static string GenerateToken(User user)
         {
@@ -25,12 +23,17 @@ namespace PokerSNTS.API
                 {
                     new Claim(ClaimTypes.Name, user.UserName.ToString())
                 }),
-                Expires = expirationDate,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = GetExpiresToken(),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret)), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return string.Format("Bearer {0}", tokenHandler.WriteToken(token));
+        }
+
+        public static DateTime GetExpiresToken()
+        {
+            return DateTime.UtcNow.AddHours(expirationTime);
         }
 
         public static void ConfigureToken(this IServiceCollection services)
@@ -47,7 +50,7 @@ namespace PokerSNTS.API
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(_key),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret)),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };

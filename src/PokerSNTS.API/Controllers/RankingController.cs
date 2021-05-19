@@ -173,7 +173,7 @@ namespace PokerSNTS.API.Controllers
 
         [HttpGet("Point/filter")]
         public async Task<IActionResult> GetPointByPositionAsync([FromQuery]short position)
-        {
+            {
             var rankingPoint = await _rankingPointService.GetByPositionAsync(position);
 
             if (rankingPoint != null)
