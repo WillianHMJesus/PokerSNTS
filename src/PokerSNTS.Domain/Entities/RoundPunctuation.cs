@@ -32,10 +32,10 @@ namespace PokerSNTS.Domain.Entities
             return validationResult;
         }
 
-        public void Update(short position, short Point, Guid playerId, Guid roundId)
+        public void Update(short position, short point, Guid playerId, Guid roundId)
         {
             Position = position;
-            Point = Point;
+            Point = point;
             PlayerId = playerId;
             RoundId = roundId;
         }

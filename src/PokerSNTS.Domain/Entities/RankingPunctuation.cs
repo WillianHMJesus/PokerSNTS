@@ -5,10 +5,10 @@ namespace PokerSNTS.Domain.Entities
 {
     public class RankingPoint : Entity
     {
-        public RankingPoint(short position, short Point)
+        public RankingPoint(short position, short point)
         {
             Position = position;
-            Point = Point;
+            Point = point;
         }
 
         protected RankingPoint() { }
@@ -25,10 +25,10 @@ namespace PokerSNTS.Domain.Entities
             return validationResult;
         }
 
-        public void Update(short position, short Point)
+        public void Update(short position, short point)
         {
             Position = position;
-            Point = Point;
+            Point = point;
         }
 
         private class RankingPointValidator : AbstractValidator<RankingPoint>

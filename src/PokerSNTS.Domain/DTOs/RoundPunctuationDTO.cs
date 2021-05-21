@@ -4,11 +4,11 @@ namespace PokerSNTS.Domain.DTOs
 {
     public class RoundPointDTO
     {
-        public RoundPointDTO(Guid id, short position, short Point, Guid playerId, Guid roundId)
+        public RoundPointDTO(Guid id, short position, short point, Guid playerId, Guid roundId)
         {
             Id = id;
             Position = position;
-            Point = Point;
+            Point = point;
             PlayerId = playerId;
             RoundId = roundId;
         }

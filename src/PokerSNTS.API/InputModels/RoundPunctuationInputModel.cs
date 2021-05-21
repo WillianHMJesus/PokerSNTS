@@ -5,10 +5,10 @@ namespace PokerSNTS.API.InputModels
 {
     public class RoundPointInputModel
     {
-        [RegularExpression("^((?!0).)*$", ErrorMessage = "A posição da rodada não foi informada.")]
+        [Range(1, 9999999999999, ErrorMessage = "A posição da rodada não foi informada.")]
         public short Position { get; set; }
 
-        [RegularExpression("^((?!0).)*$", ErrorMessage = "A pontuação da rodada não foi informada.")]
+        [Range(1, 9999999999999, ErrorMessage = "A pontuação da rodada não foi informada.")]
         public short Point { get; set; }
 
         [RegularExpression("^((?!00000000-0000-0000-0000-000000000000).)*$", ErrorMessage = "O jogador não foi informado.")]
