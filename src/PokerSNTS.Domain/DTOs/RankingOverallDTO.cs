@@ -14,15 +14,15 @@ namespace PokerSNTS.Domain.DTOs
         public string Description { get; set; }
         public decimal? AwardValue { get; set; }
         public int NumberRounds { get; set; }
-        public string LeaderPlayer => GetLeaderPlayer();
-        public decimal LeaderValue => GetLeaderValue();
-        public string ViceLeaderPlayer => GetViceLeaderPlayer();
-        public decimal ViceLeaderValue => GetViceLeaderValue();
-        public string AveragePlayer => GetAveragePlayer();
-        public decimal AverageValue => GetAverageValue();
+        public string LeaderPlayer => GetFirstPlacePlayer();
+        public decimal LeaderValue => GetFirstPlaceValue();
+        public string ViceLeaderPlayer => GetSecondPlacePlayer();
+        public decimal ViceLeaderValue => GetSecondPlaceValue();
+        public string AveragePlayer => GetThirdPlacePlayer();
+        public decimal AverageValue => GetThirdPlaceValue();
         public ICollection<PlayerRankingDTO> Players { get; set; }
 
-        private string GetLeaderPlayer()
+        private string GetFirstPlacePlayer()
         {
             return Players
                 ?.OrderByDescending(x => x.Points)
@@ -30,7 +30,7 @@ namespace PokerSNTS.Domain.DTOs
                 ?.FirstOrDefault();
         }
 
-        private string GetViceLeaderPlayer()
+        private string GetSecondPlacePlayer()
         {
             return Players
                 ?.Where(x => !x.Name.Equals(LeaderPlayer))
@@ -39,33 +39,31 @@ namespace PokerSNTS.Domain.DTOs
                 ?.FirstOrDefault();
         }
 
-        private string GetAveragePlayer()
+        private string GetThirdPlacePlayer()
         {
             return Players
-                ?.Where(x => x.Matches >= (NumberRounds / 2))
-                ?.OrderByDescending(x => x.Average)
-                ?.ThenByDescending(x => x.Points)
-                ?.ThenByDescending(x => x.Matches)
+                ?.Where(x => !x.Name.Equals(LeaderPlayer) && !x.Name.Equals(ViceLeaderPlayer))
+                ?.OrderByDescending(x => x.Points)
                 ?.Select(x => x.Name)
                 ?.FirstOrDefault();
         }
 
-        private decimal GetLeaderValue()
+        private decimal GetFirstPlaceValue()
         {
             return AwardValue.HasValue ? 
                 Math.Round(AwardValue.Value * 0.5M, 2) : 0;
         }
 
-        private decimal GetViceLeaderValue()
+        private decimal GetSecondPlaceValue()
         {
             return AwardValue.HasValue ? 
-                Math.Round(AwardValue.Value * 0.25M, 2) : 0;
+                Math.Round(AwardValue.Value * 0.35M, 2) : 0;
         }
 
-        private decimal GetAverageValue()
+        private decimal GetThirdPlaceValue()
         {
             return AwardValue.HasValue ? 
-                Math.Round(AwardValue.Value * 0.25M, 2) : 0;
+                Math.Round(AwardValue.Value * 0.15M, 2) : 0;
         }
     }
 }
